@@ -1,0 +1,8 @@
+langchain_ollama
+langchain_core
+langchain
+ollama
+langchain_ollama
+langchain_chroma
+langchain_text_splitters
+pandas
