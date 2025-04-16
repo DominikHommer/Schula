@@ -5,6 +5,8 @@ from langchain.vectorstores.chroma import Chroma
 
 import ollama
 
+from vector import retriever
+
 DB_PATH = "vector_db_test"
 ### ------- ###
 
@@ -27,7 +29,7 @@ Define precise tasks here.
 
 """
 
-db = Chroma(persist_directory=DB_PATH, embedding)
+# db = Chroma(persist_directory=DB_PATH, embedding_function=)
 
 prompt = ChatPromptTemplate.from_template(template)
 
@@ -41,6 +43,7 @@ while True:
         break
 
     # get knowledge from the school textbook for example
-    task = db.similarity_search_with_score(question,  k=5)
+    # task = db.similarity_search_with_score(question,  k=5)
+    task = retriever.invoke(question)
     result = chain.invoke({"task":task, "question":question})
     print(result)

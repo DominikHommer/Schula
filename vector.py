@@ -14,8 +14,7 @@ def split_documents(documents: list[Document]):
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size = 800,
         chunk_overlap = 80,
-        length_function = len,
-        is_seperator_regex = False,
+        length_function = len
     )
     return text_splitter.split_documents(documents)
 
@@ -48,9 +47,14 @@ def add_to_db(chunks: list[Document]):
         print(f"Adding new documents: {len(new_chunks)}")
         new_chunk_ids = [chunk.metadata["id"] for chunk in new_chunks]
         vector_store.add_documents(new_chunks, ids=new_chunk_ids)
-        vector_store.persist()
+        # vector_store.persist()
     else:
         print("No new documents to add")
+
+    # experiment with different approaches
+    retriever = vector_store.as_retriever(search_kwargs={"k":20})
+
+    return retriever
 
 
 def get_chunk_ids(chunks):
@@ -80,20 +84,12 @@ def get_chunk_ids(chunks):
 
 ### main 
 
-def main():
+# load pdfs from directory
+loader = PyPDFDirectoryLoader(DATA_DIR)
+documents = loader.load()
+chunks = split_documents(documents)
+retriever = add_to_db(chunks)
 
-    # load pdfs from directory
-    loader = PyPDFDirectoryLoader(DATA_DIR)
-    documents = loader.load()
-    chunks = split_documents(documents)
-    add_to_db(chunks)
-
-
-
-
-
-if __name__ == "__main__":
-    main()
 
 
 
