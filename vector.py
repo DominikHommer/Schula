@@ -10,6 +10,8 @@ DATA_DIR = "data"
 DB_PATH = "vector_db_test"
 
 ### functions ###
+# try different approaches for text splitting here !!!
+    # recursive text splitter tries to maintain semantic coherence by splitting recursively using a list of separators 
 def split_documents(documents: list[Document]):
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size = 800,

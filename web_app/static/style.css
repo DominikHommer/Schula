@@ -1,0 +1,10 @@
+body { font-family: sans-serif; margin: 20px; }
+#chatbox { border: 1px solid #ccc; padding: 10px; margin-top: 15px; }
+#messages { height: 300px; overflow-y: scroll; border-bottom: 1px solid #eee; margin-bottom: 10px; padding-bottom: 10px; }
+#chat-input { width: calc(100% - 80px); padding: 8px; }
+#send-button { padding: 8px 15px; }
+#upload-status { margin-left: 10px; font-style: italic; }
+label { display: block; margin-bottom: 5px; }
+input[type=file] { margin-bottom: 10px; }
+hr { margin: 20px 0; }
+button { cursor: pointer; }
