@@ -1,20 +1,28 @@
 import os
 import numpy as np
 import cv2
+from .module_base import Module
 
-class RedRemover:
+class RedRemover(Module):
     """
     Entfernt in einem Bild rote Bereiche, indem Pixel, die gewisse Kriterien 
     (rote Dominanz) erfüllen, auf Weiß gesetzt werden.
     Optional kann ein Debug-Bild gespeichert werden.
     """
     def __init__(self, debug=False, debug_folder="debug/debug_redremover"):
+        super().__init__("red-remover")
+
         self.debug = debug
         self.debug_folder = debug_folder
         if self.debug:
             os.makedirs(self.debug_folder, exist_ok=True)
     
-    def process(self, image: np.ndarray) -> np.ndarray:
+    def get_preconditions(self) -> list[str]:
+        return ['input']
+    
+    def process(self, data: dict) -> np.ndarray:
+        image: np.ndarray = data['input']
+
         img = image.copy()
         r = img[:, :, 2]
         g = img[:, :, 1]

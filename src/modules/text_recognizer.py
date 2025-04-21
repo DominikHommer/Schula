@@ -2,14 +2,17 @@ import os
 from PIL import Image
 import cv2
 from transformers import TrOCRProcessor, VisionEncoderDecoderModel
+from .module_base import Module
 
-class TextRecognizer:
+class TextRecognizer(Module):
     """
     Nutzt das TrOCR-Modell zur Handschriftenerkennung in Bildausschnitten.
     Erkennt den Text und erstellt optional ein Debug-Log, das die 
     erkannten Ergebnisse auflistet.
     """
     def __init__(self, model_name="fhswf/TrOCR_german_handwritten", debug=False, debug_folder="debug/debug_textrecognizer"):
+        super().__init__("text-recognizer")
+
         self.processor = TrOCRProcessor.from_pretrained(model_name)
         self.model = VisionEncoderDecoderModel.from_pretrained(model_name)
         self.debug = debug
@@ -17,7 +20,12 @@ class TextRecognizer:
         if self.debug:
             os.makedirs(self.debug_folder, exist_ok=True)
     
-    def process(self, images: list) -> list:
+    def get_preconditions(self) -> list[str]:
+        return ['line-cropper']
+    
+    def process(self, data: dict) -> list:
+        images: list = data.get('line-cropper')
+
         texts = []
         debug_log = []
         for idx, img in enumerate(images):

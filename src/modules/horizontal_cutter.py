@@ -1,8 +1,9 @@
 import os
 import numpy as np
 import cv2
+from .module_base import Module
 
-class HorizontalCutter:
+class HorizontalCutter(Module):
     """
     Schneidet ein Bild horizontal in Abschnitte, indem graue Zeilen gefunden 
     und als Trenner verwendet werden.
@@ -12,6 +13,8 @@ class HorizontalCutter:
     def __init__(self, black_thresh=50, gray_min=100, gray_max=200, 
                  gray_tolerance=40, gray_threshold=50, cluster_gap=10, 
                  min_height=30, debug=False, debug_folder="debug/debug_horizontalcutter"):
+        super().__init__("horizontal-cutter")
+
         self.black_thresh = black_thresh
         self.gray_min = gray_min
         self.gray_max = gray_max
@@ -24,7 +27,15 @@ class HorizontalCutter:
         if self.debug:
             os.makedirs(self.debug_folder, exist_ok=True)
     
-    def process(self, image: np.ndarray) -> list:
+    def get_preconditions(self) -> list[str]:
+        return ['input']
+
+    def process(self, data: dict) -> list:
+        if data.get('red-remover', None) is not None:
+            image: np.ndarray = data['red-remover']
+        else:
+            image: np.ndarray = data['input']
+
         height, width, _ = image.shape
         gray_rows = []
         for y in range(height):

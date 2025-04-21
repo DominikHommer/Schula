@@ -1,8 +1,9 @@
 import os
 import cv2
 import numpy as np
+from .module_base import Module
 
-class LineCropper:
+class LineCropper(Module):
     """
     Schneidet in jedem Bildausschnitt den relevanten Bereich zu, 
     indem die Konturen (z.B. des Textes) ermittelt werden.
@@ -10,13 +11,20 @@ class LineCropper:
     Bounding-Box) gespeichert.
     """
     def __init__(self, padding=10, debug=False, debug_folder="debug/debug_linecropper"):
+        super().__init__("line-cropper")
+        
         self.padding = padding
         self.debug = debug
         self.debug_folder = debug_folder
         if self.debug:
             os.makedirs(self.debug_folder, exist_ok=True)
 
-    def process(self, sections: list) -> list:
+    def get_preconditions(self) -> list[str]:
+        return ['horizontal-cutter']
+    
+    def process(self, data: dict) -> list:
+        sections: list = data.get('horizontal-cutter')
+
         cropped_images = []
         for idx, img in enumerate(sections):
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
