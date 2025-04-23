@@ -1,7 +1,7 @@
 import os
 import cv2
 import fleep
-import pymupdf
+from pdf2image import convert_from_path
 
 from .pipeline import Pipeline
 
@@ -24,13 +24,12 @@ class CVPipeline(Pipeline):
     def run_and_save_text(self, image_path: str, output_txt: str):
         inputs = [image_path]
         if self._is_pdf(image_path):
-            doc = pymupdf.open(image_path)
-
+            images = convert_from_path(image_path)
+            
             inputs = []
-            for i, page in enumerate(doc):
-                pix = page.get_pixmap()
+            for i, img in enumerate(images):
                 path = f"{os.path.dirname(image_path)}/image_{i}.png"
-                pix.save(path)
+                img.save(path)
                 inputs.append(path)
 
         ret = []

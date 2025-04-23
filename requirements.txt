@@ -28,4 +28,4 @@ transformers==4.51.3
 typing_extensions==4.13.2
 urllib3==2.4.0
 fleep==1.0.1
-pymupdf==1.25.5
+pdf2image==1.17.0
