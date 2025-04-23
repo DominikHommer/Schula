@@ -29,4 +29,5 @@ typing_extensions==4.13.2
 urllib3==2.4.0
 fleep==1.0.1
 pdf2image==1.17.0
-ultralytics==8.3.114
+ultralytics==8.3.115
+tensorflow==2.19.0
