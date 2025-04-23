@@ -93,6 +93,8 @@ def run():
     ### TODO: Handle multiple Files in Loop ###
     student_file = st.file_uploader("Klausur-Scans hochladen (PNG)", type=["png"], key="student_file", accept_multiple_files=False) # accept_multiple_files=True
     teacher_file = st.file_uploader("Musterlösung hochladen (PNG)", type=["png"], key="teacher_file", accept_multiple_files=False)
+
+    # 
     student_path = save_temp_file(student_file, prefix="student")
     teacher_path = save_temp_file(teacher_file, prefix="teacher")
 

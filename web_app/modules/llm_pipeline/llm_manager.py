@@ -101,7 +101,8 @@ class LlmManager:
         # --- Chain model and prompt to get the LLM response --- #
         chain = prompt | self.model
         
-        if not chat_history:
+        # if message is first message
+        if len(chat_history) == 1 and isinstance(chat_history[0], AIMessage):
             model_output = chain.invoke({"question": user_prompt, "test_student":test_student, "test_solution":test_solution})
         else:
             model_output = chain.invoke({"chat_history": chat_history, "question":user_prompt})
