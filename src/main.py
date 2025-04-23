@@ -3,13 +3,15 @@ import os
 from pipelines.cv_pipeline import CVPipeline
 from modules.red_remover import RedRemover
 from modules.horizontal_cutter import HorizontalCutter
+from modules.horizontal_cutter_line_detect import HorizontalCutterLineDetect
+
 from modules.line_cropper import LineCropper
 from modules.text_recognizer import TextRecognizer
 
 
 pipeline = CVPipeline()
 pipeline.add_stage(RedRemover(debug=True))
-pipeline.add_stage(HorizontalCutter(debug=True))
+pipeline.add_stage(HorizontalCutterLineDetect(debug=True))
 pipeline.add_stage(LineCropper(debug=True))
 pipeline.add_stage(TextRecognizer(debug=True))
 
