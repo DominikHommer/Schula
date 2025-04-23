@@ -3,42 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Analyzer</title>
+    <title>Test Analyzer (WebSocket)</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- removed integrity="sha384-2huaZvOR9iDzHqslqwpBb7O+gzPAPvldVUzmIQ+iosRMvLWBGqezEmhnlATVBNct" crossorigin="anonymous" -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
 <body>
-    <h1>Class Test Analyzer</h1>
+    <h1>Class Test Analyzer (WebSocket Mode)</h1>
 
     <form id="upload-form" enctype="multipart/form-data">
-        <h2>Upload Files</h2>
+        <h2>1. Upload Files</h2>
         <label for="test-files">Upload Test PNGs:</label>
         <input type="file" id="test-files" name="test_files" accept=".png" multiple required><br><br>
 
         <label for="solution-file">Upload Example Solution (PNG, TXT, MD):</label>
         <input type="file" id="solution-file" name="solution_file" accept=".png,.txt,.md"><br><br>
 
-        <button type="submit">Upload and Process</button>
+        <button type="submit" id="upload-button">Upload and Process Files</button>
         <span id="upload-status"></span>
+        <p><small>Upload files first. Chat will be enabled after successful processing.</small></p>
     </form>
 
     <hr>
 
-    <h2>Chat with LLM</h2>
+    <h2>2. Chat with LLM</h2>
     <div id="chatbox">
         <div id="messages">
-            {% for msg in chat_history %}
-                <p><strong>You:</strong> {{ msg.user }}</p>
-                <p><strong>LLM:</strong> {{ msg.llm }}</p>
-            {% endfor %}
+            <p><i>Waiting for connection and file upload...</i></p>
         </div>
-        <input type="text" id="chat-input" placeholder="Ask something...">
-        <button id="send-button">Send</button>
+        <div id="input-area">
+             <input type="text" id="chat-input" placeholder="Ask something..." disabled>
+             <button id="send-button" disabled>Send</button>
+        </div>
     </div>
 
     <hr>
 
     <form action="{{ url_for('reset_session') }}" method="post" id="reset-form">
          <h2>Reset Session</h2>
+         <p><small>This will clear the chat, delete uploaded files from the server, and require you to upload again.</small></p>
         <button type="submit">Refresh and Delete Files</button>
     </form>
 

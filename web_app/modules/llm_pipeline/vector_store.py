@@ -1,3 +1,9 @@
+### Decription ###
+
+# This creates the vector store for the text books
+
+### ---------- ###
+
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
@@ -6,8 +12,10 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 import os
 import pandas
 
-DATA_DIR = "data"
-DB_PATH = "vector_db_test"
+# data directory is where the text books are stored
+    # try it with scans, but it will likely not work
+DATA_DIR = "../../projects/schula/data/text_books/scans"
+DB_PATH = "vector_db_text_books"
 
 ### functions ###
 # try different approaches for text splitting here !!!
@@ -91,38 +99,3 @@ loader = PyPDFDirectoryLoader(DATA_DIR)
 documents = loader.load()
 chunks = split_documents(documents)
 retriever = add_to_db(chunks)
-
-
-
-
-# if add_documents:
-
-#     # load pdfs from directory
-#     loader = PyPDFDirectoryLoader("directory")
-#     documents = loader.load()
-
-#     # chunck the text book into manageable pieces
-#     chunks = split_documents(documents)
-
-#     last_page_id = None
-#     current_chunk_index = 0
-
-#     for chunk in chunks:
-#         source = chunk.metadata.get("source")
-#         page = chunk.metadata.get("page")
-#         current_page_id = f"{source}:{page}"
-#         if current_page_id == last_page_id:
-#             current_chunk_index += 1
-#         else:
-#             current_chunk_index = 0
-
-#     # Calculate the chunk ID.
-#         chunk_id = f"{current_page_id}:{current_chunk_index}"
-#         last_page_id = current_page_id
-
-#         # Add it to the page meta-data.
-#         chunk.metadata["id"] = chunk_id
-
-
-
-# retriever = vector_store.as_retriever(search_kwargs={"k":20})

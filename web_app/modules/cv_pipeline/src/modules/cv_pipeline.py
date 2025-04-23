@@ -33,3 +33,16 @@ class CVPipeline:
             print(f"[CVPipeline] Erkannt Texte gespeichert in: {output_txt}")
         else:
             raise ValueError("Das Endergebnis der Pipeline entspricht nicht der erwarteten Textliste.")
+        
+    ## added ##
+    def run_and_return_text(self, image_path: str):
+        image = cv2.imread(image_path)
+
+        if image is None:
+            raise ValueError(f"Bild konnte nicht geladen werden: {image_path}")
+        
+        data = image
+        for stage in self.stages:
+            data = stage.process(data)
+        
+        return data
