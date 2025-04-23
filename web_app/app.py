@@ -114,6 +114,8 @@ def run():
         teacher_text = run_cv_pipeline(teacher_path)
         st.session_state["teacher_text"] = teacher_text
         st.text_area("Extracted Teacher Text", teacher_text, height=150)
+
+        
     ### TODO ###
 
     student_text = st.session_state.get("student_text", "")
