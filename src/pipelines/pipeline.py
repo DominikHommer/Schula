@@ -12,12 +12,15 @@ class Pipeline:
     def add_stage(self, stage):
         self.stages.append(stage)
     
+    def _check_condition(self, module: Module):
+        for condition in module.get_preconditions():
+            if self.data.get(condition, None) is None:
+                raise Exception(f"Precondition of ${module.module_key} not fulfilled")
+
     def run(self, input_data = None):
         self.data['input'] = input_data
         for module in self.stages:
-            for condition in module.get_preconditions():
-                if self.data.get(condition, None) is None:
-                    raise Exception(f"Precondition of ${module.module_key} not fulfilled")
+            self._check_condition(module)
 
             self.data[module.module_key] = module.process(self.data)
 

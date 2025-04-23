@@ -23,7 +23,7 @@ class LineCropper(Module):
         return ['horizontal-cutter']
     
     def process(self, data: dict) -> list:
-        sections: list = data.get('horizontal-cutter')
+        sections: list = data.get('horizontal-cutter', [])
 
         cropped_images = []
         for idx, img in enumerate(sections):
