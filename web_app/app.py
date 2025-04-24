@@ -2,6 +2,7 @@ import streamlit as st
 import sys
 import tempfile
 import os
+import time
 
 import ollama
 import streamlit as st
@@ -20,52 +21,6 @@ from modules.cv_pipeline.src.modules.text_recognizer import TextRecognizer
 from modules.llm_pipeline.llm_manager import LlmManager, initialize_model
 # from modules.llm_pipeline.vector_store import retriever
 
-
-def app_session_init():
-    if "chat_history" not in st.session_state:
-        st.session_state["chat_history"] = [AIMessage("Hi, lade die Dateien hoch und ich kann dir weiterhelfen :)")]
-
-    # Maybe add model selection back later
-    # if "selected_model" not in st.session_state:
-    #     st.session_state["selected_model"] = get_models()[0]
-
-    # write chat history back
-    chat_history = st.session_state["chat_history"]
-    for history in chat_history:
-        if isinstance(history, AIMessage):
-            st.chat_message("ai").write(history.content)
-
-        if isinstance(history, HumanMessage):
-            st.chat_message("human").write(history.content)
-
-
-### Maybe add model selection field back later
-# def get_models():
-#     models = ollama.list()
-#     if not models:
-#         print("No models found, please visit: https://ollama.dev/models")
-#         sys.exit(1)
-
-#     models_list = []
-#     for model in models["models"]:
-#         models_list.append(model["name"])
-
-#     return models_list
-
-
-def run_cv_pipeline(image_path):
-    cv_pipeline = CVPipeline()
-    cv_pipeline.add_stage(RedRemover(debug=True))
-    cv_pipeline.add_stage(HorizontalCutter(debug=True))
-    cv_pipeline.add_stage(LineCropper(debug=True))
-    cv_pipeline.add_stage(TextRecognizer(debug=True))
-
-    print(f"Running CV pipeline on: {image_path}")
-    extracted_text = cv_pipeline.run_and_return_text(image_path)
-
-    return extracted_text
-
-
 def save_temp_file(uploaded_file, prefix="student"):
     if uploaded_file is None:
         return None
@@ -81,77 +36,206 @@ def save_temp_file(uploaded_file, prefix="student"):
 
     return temp_file.name  # Return the full path to use elsewhere
 
+def run_cv_pipeline(image_path):
+
+    cv_pipeline = CVPipeline()  
+    cv_pipeline.add_stage(RedRemover(debug=True))   
+    cv_pipeline.add_stage(HorizontalCutter(debug=True)) 
+    cv_pipeline.add_stage(LineCropper(debug=True))  
+    cv_pipeline.add_stage(TextRecognizer(debug=True))  
+
+    print(f"Running CV pipeline on: {image_path}")  
+
+    extracted_text = cv_pipeline.run_and_return_text(image_path)    
+    return extracted_text
+
+# --- Helper functions (app_session_init, run_cv_pipeline, save_temp_file) remain the same ---
+
+def app_session_init():
+    # Initialize session state keys if they don't exist
+    if "chat_history" not in st.session_state:
+        st.session_state["chat_history"] = [AIMessage(content="Hi, lade die Dateien hoch und ich kann dir weiterhelfen :)")]
+    if "student_file_processed" not in st.session_state:
+        st.session_state["student_file_processed"] = False
+    if "teacher_file_processed" not in st.session_state:
+        st.session_state["teacher_file_processed"] = False
+    if "student_text" not in st.session_state:
+        st.session_state["student_text"] = ""
+    if "teacher_text" not in st.session_state:
+        st.session_state["teacher_text"] = ""
+    if "student_file_id" not in st.session_state:
+        st.session_state["student_file_id"] = None # To track if the file changed
+    if "teacher_file_id" not in st.session_state:
+        st.session_state["teacher_file_id"] = None # To track if the file changed
+
+    # --- Display existing chat history ---
+    # Check if chat_history exists and is iterable
+    if "chat_history" in st.session_state and isinstance(st.session_state.chat_history, list):
+         # IMPORTANT: Display history *before* potential updates in the main run() logic
+         # Only display AI and Human messages here. System messages usually aren't shown.
+        for msg in st.session_state.chat_history:
+            if isinstance(msg, AIMessage):
+                with st.chat_message("ai"):
+                    st.write(msg.content)
+            elif isinstance(msg, HumanMessage):
+                 with st.chat_message("human"):
+                    st.write(msg.content)
+            # Do not display SystemMessage in the chat UI
+
 
 def run():
     st.set_page_config(page_title="Helferlein")
     st.header("Lehrer :blue[Helferlein]")
-    # st.selectbox("Select LLM:", get_models(), key="selected_model")
 
-    ###
-    st.subheader("Scans hochladen (PNG)")
-
-    ### TODO: Handle multiple Files in Loop ###
-    student_file = st.file_uploader("Klausur-Scans hochladen (PNG)", type=["png"], key="student_file", accept_multiple_files=False) # accept_multiple_files=True
-    teacher_file = st.file_uploader("Musterlösung hochladen (PNG)", type=["png"], key="teacher_file", accept_multiple_files=False)
-
-    # 
-    student_path = save_temp_file(student_file, prefix="student")
-    teacher_path = save_temp_file(teacher_file, prefix="teacher")
-
-    st.write("Klausur gespeichert:", student_path)
-    st.write("Musterlösung gespeichert:", teacher_path)
-    
-
-    if student_file:
-        st.image(student_file, caption="Student's Answer", use_column_width=True)
-        # Run your image-to-text pipeline here:
-        student_text = run_cv_pipeline(student_path)
-        st.session_state["student_text"] = student_text
-        st.text_area("Extracted Student Text", student_text, height=150)
-
-    if teacher_file:
-        st.image(teacher_file, caption="Teacher's Solution", use_column_width=True)
-        teacher_text = run_cv_pipeline(teacher_path)
-        st.session_state["teacher_text"] = teacher_text
-        st.text_area("Extracted Teacher Text", teacher_text, height=150)
-
-        
-    ### TODO ###
-
-    student_text = st.session_state.get("student_text", "")
-    teacher_text = st.session_state.get("teacher_text", "")
-
-    # convert list of strings to just one string
-    student_text = " ".join(student_text)
-    teacher_text = " ".join(teacher_text)
-
-    ###
-    # Add something that indicated the files are still being processed
-
-    ###
-
+    # --- Initialize session state ---
+    # Call this early to ensure keys exist before widgets that might use them
     app_session_init()
 
-    prompt = st.chat_input("Schreibe einen prompt...")
+    # --- Sidebar for File Upload and Reset ---
+    with st.sidebar:
+        st.subheader("Scans hochladen (PNG)")
+        uploaded_student_file = st.file_uploader("Klausur-Scan hochladen", type=["png"], key="student_uploader")
+        uploaded_teacher_file = st.file_uploader("Musterlösung hochladen", type=["png"], key="teacher_uploader")
 
-    ### Load LLM Pipeline
-    
-    # Maybe add this back later
-    # selected_model = st.session_state["selected_model"]
-    # print("Selected model: ", selected_model)
+        if st.button("Chat zurücksetzen (Musterlösung beibehalten)"):
+            # Clear relevant session state parts
+            st.session_state.chat_history = [AIMessage(content="Chat zurückgesetzt. Bitte lade Dateien hoch.")]
+            st.session_state.student_file_processed = False
+            st.session_state.student_text = ""
+            st.session_state.student_file_id = None
+            st.rerun()# Force rerun to clear chat display and show initial message
 
-    # initialize model
-    model = initialize_model() # default deepseek:70b
+        if st.button("Gesamten Chat zurücksetzen", type="primary"):
+            st.session_state.chat_history = [AIMessage(content="Chat zurückgesetzt. Bitte lade Dateien hoch.")]
+            st.session_state.student_file_processed = False
+            st.session_state.teacher_file_processed = False
+            st.session_state.student_text = ""
+            st.session_state.teacher_text = ""
+            st.session_state.student_file_id = None
+            st.session_state.teacher_file_id = None
+            st.rerun()
 
+    # --- Process Student File (only if changed and not processed) ---
+    if uploaded_student_file is not None:
+        # Check if it's a new file or hasn't been processed
+        current_file_id = f"{uploaded_student_file.name}_{uploaded_student_file.size}"
+        if st.session_state.student_file_id != current_file_id:
+            st.session_state.student_file_processed = False # Mark as needing processing
+            st.session_state.student_file_id = current_file_id
+
+        if not st.session_state.student_file_processed:
+            with st.spinner("Verarbeite Klausur-Scan..."):
+                student_path = save_temp_file(uploaded_student_file, prefix="student")
+                if student_path:
+                    # --- Run CV Pipeline ---
+                    extracted_text_list = run_cv_pipeline(student_path) # Assuming returns list
+
+                    # --- Join the text (assuming list output) ---
+                    # Important: Check the actual return type of run_cv_pipeline
+                    if isinstance(extracted_text_list, list):
+                        st.session_state["student_text"] = " ".join(extracted_text_list)
+                    elif isinstance(extracted_text_list, str):
+                         st.session_state["student_text"] = extracted_text_list # If it returns a string
+                    else:
+                         st.session_state["student_text"] = "" # Handle unexpected type
+                         st.error("Fehler beim Extrahieren des Textes aus der Klausur.")
+
+                    st.session_state["student_file_processed"] = True
+                    st.success("Klausur-Scan verarbeitet.")
+                    # Clean up temp file immediately if possible, or manage deletion later
+                    try:
+                        os.remove(student_path)
+                    except OSError as e:
+                        st.warning(f"Konnte temporäre Datei nicht löschen: {student_path}, Fehler: {e}")
+                else:
+                    st.error("Konnte Klausur-Scan nicht speichern.")
+            st.rerun() # Rerun after processing to update UI correctly
+
+    # --- Process Teacher File (only if changed and not processed) ---
+    if uploaded_teacher_file is not None:
+        current_file_id = f"{uploaded_teacher_file.name}_{uploaded_teacher_file.size}"
+        if st.session_state.teacher_file_id != current_file_id:
+            st.session_state.teacher_file_processed = False
+            st.session_state.teacher_file_id = current_file_id
+
+        if not st.session_state.teacher_file_processed:
+             with st.spinner("Verarbeite Musterlösung..."):
+                teacher_path = save_temp_file(uploaded_teacher_file, prefix="teacher")
+                if teacher_path:
+                    # --- Run CV Pipeline ---
+                    extracted_text_list = run_cv_pipeline(teacher_path)
+
+                     # --- Join the text (assuming list output) ---
+                    if isinstance(extracted_text_list, list):
+                        st.session_state["teacher_text"] = " ".join(extracted_text_list)
+                    elif isinstance(extracted_text_list, str):
+                         st.session_state["teacher_text"] = extracted_text_list
+                    else:
+                         st.session_state["teacher_text"] = ""
+                         st.error("Fehler beim Extrahieren des Textes aus der Musterlösung.")
+
+                    st.session_state["teacher_file_processed"] = True
+                    st.success("Musterlösung verarbeitet.")
+                    # Clean up temp file
+                    try:
+                        os.remove(teacher_path)
+                    except OSError as e:
+                        st.warning(f"Konnte temporäre Datei nicht löschen: {teacher_path}, Fehler: {e}")
+                else:
+                    st.error("Konnte Musterlösung nicht speichern.")
+             st.rerun() # Rerun after processing
+
+    # --- Display Processed Text and Images ---
+    st.subheader("Verarbeitete Dokumente")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.session_state.student_file_processed:
+            st.image(uploaded_student_file, caption="Klausur-Scan", use_container_width=True)
+            st.text_area("Extrahierter Klausurtext", st.session_state.student_text, height=150, key="student_text_area")
+        else:
+            st.info("Bitte Klausur-Scan hochladen.")
+
+    with col2:
+        if st.session_state.teacher_file_processed:
+            st.image(uploaded_teacher_file, caption="Musterlösung", use_container_width=True)
+            st.text_area("Extrahierter Lösungstext", st.session_state.teacher_text, height=150, key="teacher_text_area")
+        else:
+             st.info("Bitte Musterlösung hochladen.")
+
+
+    st.divider() # Separator before chat
+
+    # --- Chat Interface ---
+    st.subheader("Chat")
+
+    # Display chat history (app_session_init handles this now, called at the start)
+
+    # Get user input
+    prompt = st.chat_input("Schreibe eine Nachricht...")
+
+    # Load LLM (consider caching if slow)
+    # @st.cache_resource # Uncomment if model loading is slow
+    # def cached_initialize_model():
+    #    return initialize_model()
+    # model = cached_initialize_model()
+
+    model = initialize_model() # Keep it simple for now
     chat_bot = LlmManager(model)
 
+    # Handle chat logic
     if prompt:
-        chat_bot.get_response(prompt, student_text, teacher_text)
+        # Check if both files have been processed before allowing chat queries
+        if st.session_state.student_file_processed and st.session_state.teacher_file_processed:
+             # Pass the processed text from session state
+            chat_bot.get_response(prompt, st.session_state.student_text, st.session_state.teacher_text)
+            # After get_response updates session_state['chat_history'], rerun to display the new messages
+            st.rerun()
+        else:
+            st.warning("Bitte laden Sie zuerst beide Dateien (Klausur und Musterlösung) hoch und warten Sie, bis sie verarbeitet wurden.")
 
 
 if __name__ == "__main__":
     run()
-
 
 
 
