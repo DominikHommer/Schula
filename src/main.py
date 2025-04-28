@@ -5,6 +5,7 @@ from modules.red_remover import RedRemover
 from modules.horizontal_cutter import HorizontalCutter
 from modules.horizontal_cutter_line_detect import HorizontalCutterLineDetect
 from modules.strikethrough_cleaner import StrikeThroughCleaner
+from modules.line_denoiser import LineDenoiser
 
 from modules.line_cropper import LineCropper
 from modules.text_recognizer import TextRecognizer
@@ -14,6 +15,7 @@ pipeline = CVPipeline()
 pipeline.add_stage(RedRemover(debug=True))
 pipeline.add_stage(HorizontalCutterLineDetect(debug=True))
 pipeline.add_stage(StrikeThroughCleaner(debug=True))
+# pipeline.add_stage(LineDenoiser(debug=True)) WARNING: Don't use currently. Model needs to be adapted for varying image sizes
 pipeline.add_stage(LineCropper(debug=True))
 pipeline.add_stage(TextRecognizer(debug=True))
 
