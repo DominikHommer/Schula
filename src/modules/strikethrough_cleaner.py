@@ -8,11 +8,11 @@ class StrikeThroughCleaner(Module):
     Entfernt in jedem Bildausschnitt den durchgestrichene Stellen.
     Optional wird ein Debug-Bild (mit eingezeichneter Bounding-Box) gespeichert.
     """
-    def __init__(self, debug=False, debug_folder="debug/debug_strikethrough_cleaner"):
+    def __init__(self, debug=False, debug_folder="debug/debug_strikethrough_cleaner", model_path="models/strikethrough/best.pt"):
         super().__init__("strike-through-cleaner")
         
         self.confidence_threshold = 0.3
-        self.model = YOLO("models/strikethrough/best.pt")
+        self.model = YOLO(model_path)
         self.debug = debug
         self.debug_folder = debug_folder
         if self.debug:
@@ -53,4 +53,5 @@ class StrikeThroughCleaner(Module):
                 print(f"[StrikeThroughCleaner] Debug-Bild gespeichert: {debug_path_1}")
 
             cleaned_images.append(img)
+
         return cleaned_images

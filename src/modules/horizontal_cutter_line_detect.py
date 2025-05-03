@@ -2,6 +2,7 @@ import os
 import numpy as np
 import cv2
 import math
+import statistics
 from .module_base import Module
 
 class HorizontalCutterLineDetect(Module):
@@ -44,6 +45,22 @@ class HorizontalCutterLineDetect(Module):
     def get_preconditions(self) -> list[str]:
         return ['input']
 
+    def _remove_gray(self, img: np.ndarray) -> np.ndarray:
+        """
+        Wir entfernen graue Schrift, falls existent
+        """
+        gray_inv = cv2.bitwise_not(img)
+        _, writing_mask = cv2.threshold(gray_inv, 30, 255, cv2.THRESH_BINARY)
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+        writing_mask = cv2.morphologyEx(writing_mask, cv2.MORPH_OPEN, kernel, iterations=1)
+        gray = cv2.inpaint(img, writing_mask, 3, cv2.INPAINT_TELEA)
+
+        if self.debug:
+            dbg_path = os.path.join(self.debug_folder, "debug_horizontalCutterLineDetect_grayRemoved.jpg")
+            cv2.imwrite(dbg_path, gray)
+
+        return gray
+
     def _remove_blue(self, img: np.ndarray) -> np.ndarray:
         """
         Entfernt blau-ähnliche Pixel via Inpainting.
@@ -61,6 +78,8 @@ class HorizontalCutterLineDetect(Module):
         temp = self._remove_blue(temp)
 
         gray = cv2.cvtColor(temp, cv2.COLOR_BGR2GRAY)
+        gray = self._remove_gray(gray)
+
         if self.blur_type == 'median':
             gray = cv2.medianBlur(gray, self.blur_ksize)
         else:
@@ -89,6 +108,10 @@ class HorizontalCutterLineDetect(Module):
             print("[HorizontalCutterLineDetect] Keine horizontalen Segmente gefunden.")
             return []
 
+        if len(segments) < 10:
+            print("[HorizontalCutterLineDetect] Zu wenige horizontale Segmente gefunden.")
+            return []
+
         mid_ys = sorted((y1 + y2) / 2 for x1, y1, x2, y2 in segments)
         clusters = [[mid_ys[0]]]
         for y in mid_ys[1:]:
@@ -97,11 +120,39 @@ class HorizontalCutterLineDetect(Module):
             else:
                 clusters.append([y])
 
+        heights = []
         cut_positions = [0]
-        for cluster in clusters:
+        for i, cluster in enumerate(clusters):
             avg_y = sum(cluster) / len(cluster)
             y_cut = int(max(0, min(height - 1, avg_y + self.y_offset)))
             cut_positions.append(y_cut)
+            heights.append(y_cut - cut_positions[i])
+        cut_positions.append(height)
+
+        median_cut_height = statistics.median(heights)
+
+        cut_positions = [0]
+        i = 0
+        for cluster in clusters:
+            avg_y = sum(cluster) / len(cluster)
+            y_cut = int(max(0, min(height - 1, avg_y + self.y_offset)))
+
+            cut_height = y_cut - cut_positions[i]
+            if self.min_height > cut_height:
+                continue
+
+            # Cut based on median line height
+            while cut_height >= median_cut_height * 1.75:
+                new_y_cut = int(cut_positions[i] + median_cut_height)
+
+                i += 1
+                cut_positions.append(new_y_cut)
+
+                cut_height = y_cut - cut_positions[i]
+
+            i += 1
+            cut_positions.append(y_cut)
+            
         cut_positions.append(height)
 
         if self.debug:

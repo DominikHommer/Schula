@@ -1,4 +1,6 @@
 debug/
+data/input/*
+!data/input/image.png
 
 .DS_Store
 # Byte-compiled / optimized / DLL files
