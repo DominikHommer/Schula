@@ -26,7 +26,7 @@ class TextRecognizer(Module):
         return ['line-cropper']
     
     def process(self, data: dict) -> list:
-        images: list = data.get('line-cropper')
+        images: list = data.get('line-cropper', [])
 
         texts = []
         debug_log = []

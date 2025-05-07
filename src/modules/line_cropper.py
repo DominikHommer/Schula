@@ -10,9 +10,10 @@ class LineCropper(Module):
     Optional wird ein Debug-Bild (mit eingezeichneten Konturen und 
     Bounding-Box) gespeichert.
     """
-    def __init__(self, padding=10, debug=False, debug_folder="debug/debug_linecropper"):
+    def __init__(self, padding=10, h_desired = 120, debug=False, debug_folder="debug/debug_linecropper"):
         super().__init__("line-cropper")
         
+        self.h_desired = h_desired
         self.padding = padding
         self.debug = debug
         self.debug_folder = debug_folder
@@ -23,7 +24,7 @@ class LineCropper(Module):
         return ['horizontal-cutter']
     
     def process(self, data: dict) -> list:
-        sections: list = data.get('horizontal-cutter')
+        sections: list = data.get('horizontal-cutter', [])
 
         cropped_images = []
         for idx, img in enumerate(sections):
@@ -45,6 +46,7 @@ class LineCropper(Module):
             x2 = min(x + w + self.padding, width)
             y2 = min(y + h + self.padding, height)
             cropped = img[y1:y2, x1:x2]
+            height, width = cropped.shape[:2]
 
             if self.debug:
                 debug_img = img.copy()
@@ -53,6 +55,15 @@ class LineCropper(Module):
                 debug_path = os.path.join(self.debug_folder, f"debug_section_{idx}.png")
                 cv2.imwrite(debug_path, debug_img)
                 print(f"[LineCropper] Debug-Bild gespeichert: {debug_path}")
+
+            if height < self.h_desired:
+                w_new = int(width * (self.h_desired / height))
+                cropped = cv2.resize(cropped, (w_new, self.h_desired))
+
+                if self.debug:
+                    debug_path = os.path.join(self.debug_folder, f"debug_section_{idx}_upscaled.png")
+                    cv2.imwrite(debug_path, cropped)
+                    print(f"[LineCropper] Upscaled Debug-Bild gespeichert: {debug_path}")
 
             cropped_images.append(cropped)
         return cropped_images
