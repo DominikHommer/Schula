@@ -15,7 +15,7 @@ pipeline.add_stage(HorizontalCutterLineDetect(debug=True))
 pipeline.add_stage(LineCropper(debug=True))
 pipeline.add_stage(TextRecognizer(debug=True))
 
-input_image_path = os.path.join("data", "input", "image.png")
+input_image_path = os.path.join("data", "input", "DA_1_Seite1.png")
 output_text_file = os.path.join("data", "output", "recognized_texts.txt")
 
 result = pipeline.run_and_save_text(input_image_path, output_text_file)
