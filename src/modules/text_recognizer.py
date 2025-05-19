@@ -26,10 +26,12 @@ class TextRecognizer(Module):
         return ['line-cropper']
     
     def process(self, data: dict) -> list:
-        images: list = data.get('line-cropper', [])
+        #images: list = data.get('line-cropper', [])
+        images: list = data.get('line-prepared', [])
 
         texts = []
         debug_log = []
+
         for idx, img in enumerate(images):
             pil_img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
             inputs = self.processor(images=pil_img, return_tensors="pt")
@@ -40,9 +42,11 @@ class TextRecognizer(Module):
             print(f"[TextRecognizer] Erkannt für Bild {idx}: {text}")
             if self.debug:
                 debug_log.append(f"Bild {idx}: {text}")
+
         if self.debug:
             debug_path = os.path.join(self.debug_folder, "debug_textrecognizer.txt")
             with open(debug_path, "w", encoding="utf-8") as f:
                 f.write("\n".join(debug_log))
             print(f"[TextRecognizer] Debug-Log gespeichert in: {debug_path}")
+
         return texts

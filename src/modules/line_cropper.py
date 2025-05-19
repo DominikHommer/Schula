@@ -10,7 +10,7 @@ class LineCropper(Module):
     Optional wird ein Debug-Bild (mit eingezeichneten Konturen und 
     Bounding-Box) gespeichert.
     """
-    def __init__(self, padding=10, h_desired = 120, debug=False, debug_folder="debug/debug_linecropper"):
+    def __init__(self, padding=10, h_desired = 128, debug=False, debug_folder="debug/debug_linecropper"):
         super().__init__("line-cropper")
         
         self.h_desired = h_desired

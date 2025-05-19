@@ -2,22 +2,28 @@ import re
 import sys
 
 def remove_annotated_lines(annot_file, plain_file, out_annot, out_plain):
-    pattern = re.compile(r"<[^>]*>|\{[^}]*\}")
-    
     with open(annot_file, 'r', encoding='utf-8') as fa, \
          open(plain_file, 'r', encoding='utf-8') as fp, \
          open(out_annot,   'w', encoding='utf-8') as foa, \
          open(out_plain,   'w', encoding='utf-8') as fop:
+    
         
-        annot_lines = fa.readlines()
-        plain_lines = fp.readlines()
-        n = min(len(annot_lines), len(plain_lines))
+        annotated = fa.read()
+        transcribed = fp.read()
         
-        for i in range(n):
-            if pattern.search(annot_lines[i]):
-                continue
-            foa.write(annot_lines[i])
-            fop.write(plain_lines[i])
+        annotated = re.sub(r'\[.*?\]|\{.*?\}|<.*?>', '', annotated)
+        transcribed = re.sub(r'\[.*?\]|\{.*?\}|<.*?>', '', transcribed)
+        transcribed = re.sub(r'\s*([("])\s*', r' \1', transcribed)
+        transcribed = re.sub(r'\s*([).,?!])', r'\1', transcribed)
+
+        #annotated = annotated.replace('\n', ' ')
+        #annotated = re.sub(r'\s+', ' ', annotated).strip()
+
+        #transcribed = transcribed.replace('\n', ' ')
+        #transcribed = re.sub(r'\s+', ' ', transcribed).strip()
+
+        foa.write(annotated)
+        fop.write(transcribed)
 
 if __name__ == "__main__":
     if len(sys.argv) != 5:

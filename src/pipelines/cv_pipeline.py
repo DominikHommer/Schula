@@ -2,6 +2,7 @@ import os
 import cv2
 import fleep
 from pdf2image import convert_from_path
+import re
 
 from .pipeline import Pipeline
 
@@ -21,35 +22,51 @@ class CVPipeline(Pipeline):
         
         return False
     
-    def run_and_save_text(self, image_path: str, output_txt: str):
-        inputs = [image_path]
-        if self._is_pdf(image_path):
-            images = convert_from_path(image_path)
+    def run_and_save_text(self, paths: list[str], output_txt: str):
+        path_inputs = []
+        for input in paths:
+            if self._is_pdf(input):
+                images = convert_from_path(input)
             
-            inputs = []
-            for i, img in enumerate(images):
-                path = f"{os.path.dirname(image_path)}/image_{i}.png"
-                img.save(path)
-                inputs.append(path)
+                for i, img in enumerate(images):
+                    path = f"{os.path.dirname(input)}/image_{i}.png"
+                    img.save(path)
+                    path_inputs.append(path)
+            else:
+                path_inputs.append(input)
 
         ret = []
-        for input in inputs:
+        for input in path_inputs:
             image = cv2.imread(input)
             if image is None:
                 raise ValueError(f"Bild konnte nicht geladen werden: {input}")
             
             data = self.run(image)
-            
-            if isinstance(data, list) and all(isinstance(item, str) for item in data):
-                with open(output_txt, "w", encoding="utf-8") as f:
-                    for text in data:
-                        f.write(text + "\n")
-                print(f"[CVPipeline] Erkannt Texte gespeichert in: {output_txt}")
-            else:
-                raise ValueError("Das Endergebnis der Pipeline entspricht nicht der erwarteten Textliste.")
-            
+
             ret.append(data)
+
+        full_text = ""
+        for page in ret:
+            if not isinstance(page, list):
+                raise ValueError("Das Endergebnis der Pipeline entspricht nicht der erwarteten Textliste.")
+
+            for word in page:
+                if not isinstance(word, str):
+                    raise ValueError("Das Endergebnis der Pipeline entspricht nicht der erwarteten Textliste.")
+                
+                full_text += " " + word
+            
+            full_text += "\n"
         
+        # Wrong place but fine for now -> better: have post-process modules
+        full_text = re.sub(r'\s*([\n])\s*', r' \1', full_text)
+        #full_text = re.sub(r'\s*([.,!?;:()\[\]{}"“”])\s*', r'\1 ', full_text)
+        
+        with open(output_txt, "w", encoding="utf-8") as f:
+            f.write(full_text)
+
+            print(f"[CVPipeline] Erkannt Texte gespeichert in: {output_txt}")
+            
         if len(ret) == 1:
             return ret[0]
 

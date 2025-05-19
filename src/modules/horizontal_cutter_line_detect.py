@@ -15,6 +15,7 @@ class HorizontalCutterLineDetect(Module):
     """
     def __init__(
         self,
+        combine_amount_of_lines: int = 1,
         angle_tolerance_deg: float = 0.2,
         cluster_gap: int = 60,
         y_offset: int = 10,
@@ -28,6 +29,10 @@ class HorizontalCutterLineDetect(Module):
         debug_folder: str = "debug/debug_horizontalCutterLineDetect"
     ):
         super().__init__("horizontal-cutter")
+        if combine_amount_of_lines > 1:
+            raise Exception("TrOCR only works with single line inputs :(")
+        
+        self.combine_amount_of_lines = combine_amount_of_lines
         self.angle_tol = math.radians(angle_tolerance_deg)
         self.cluster_gap = cluster_gap
         self.y_offset = y_offset
@@ -69,6 +74,37 @@ class HorizontalCutterLineDetect(Module):
         blue_mask = (b > self.blue_min) & (b > g + self.dominance) & (b > r + self.dominance)
         img[blue_mask] = [255, 255, 255]
         return img
+    
+    def _cut_out(self, cut_positions: list[float], original: np.ndarray) -> np.ndarray:
+        height, _, _ = original.shape
+        sections = []
+
+        i = 0
+        while i < len(cut_positions) - self.combine_amount_of_lines:
+            start = cut_positions[i]
+            end = cut_positions[i + self.combine_amount_of_lines] + 15 # To get lower case g,y,etc...
+
+            if start < 0:
+                start = 0
+
+            if end > height:
+                end = height
+
+            sec = original[start:end, :, :]
+            if sec.shape[0] > self.min_height:
+                sections.append(sec)
+
+            i += self.combine_amount_of_lines
+
+        if len(cut_positions) % self.combine_amount_of_lines == 1 and i == len(cut_positions) - self.combine_amount_of_lines:
+            start = cut_positions[i] - 15
+            end = height
+            sec = original[start:end, :, :]
+
+            if sec.shape[0] > self.min_height:
+                sections.append(sec)
+        
+        return sections
 
     def process(self, data: dict) -> list:
         original: np.ndarray = data['red-remover']
@@ -163,12 +199,5 @@ class HorizontalCutterLineDetect(Module):
             cv2.imwrite(dbg_path, dbg)
             print(f"[HorizontalCutterLineDetect] Debug-Bild gespeichert in: {dbg_path}")
 
-        sections = []
-        for i in range(len(cut_positions) - 1):
-            start, end = cut_positions[i], cut_positions[i + 1]
-            sec = original[start:end, :, :]
-            if sec.shape[0] > self.min_height:
-                sections.append(sec)
-
-        return sections
+        return self._cut_out(cut_positions, original)
 
