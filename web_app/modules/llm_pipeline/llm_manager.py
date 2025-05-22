@@ -10,7 +10,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder # Imp
 
 DB_PATH = "vector_db_test"
 
-def initialize_model(model="deepseek-r1:70b"):
+def initialize_model(model="llama4:latest"):
     return ChatOllama(model=model)
 
 class LlmManager:
@@ -94,7 +94,6 @@ class LlmManager:
         # as ai_response_content is the string returned by st.write_stream
         st.session_state["chat_history"].append(AIMessage(content=ai_response_content))
 
-        # No need to return model_output_stream as it's consumed by st.write_stream
 
 # Helper function for vector store
 def get_text_book_content(query):
