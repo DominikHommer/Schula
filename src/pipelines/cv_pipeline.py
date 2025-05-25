@@ -22,7 +22,7 @@ class CVPipeline(Pipeline):
         
         return False
     
-    def run_and_save_text(self, paths: list[str], output_txt: str):
+    def run_and_save_text(self, paths: list[str], output_txt: str|None = None):
         path_inputs = []
         for input in paths:
             if self._is_pdf(input):
@@ -62,10 +62,11 @@ class CVPipeline(Pipeline):
         full_text = re.sub(r'\s*([\n])\s*', r' \1', full_text)
         #full_text = re.sub(r'\s*([.,!?;:()\[\]{}"“”])\s*', r'\1 ', full_text)
         
-        with open(output_txt, "w", encoding="utf-8") as f:
-            f.write(full_text)
+        if output_txt is not None:
+            with open(output_txt, "w", encoding="utf-8") as f:
+                f.write(full_text)
 
-            print(f"[CVPipeline] Erkannt Texte gespeichert in: {output_txt}")
+                print(f"[CVPipeline] Erkannt Texte gespeichert in: {output_txt}")
             
         if len(ret) == 1:
             return ret[0]

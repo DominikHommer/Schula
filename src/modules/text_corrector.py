@@ -20,10 +20,24 @@ class TextCorrector(Module):
         super().__init__("text-corrector")
 
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.debug = debug
+        self.debug_folder = debug_folder
+        if self.debug:
+            os.makedirs(self.debug_folder, exist_ok=True)
+
+    def _setup(self):
         self.hunspell = Dictionary.from_files('models/hunspell/de_DE_frami')
         self.symspell = SymSpell(max_dictionary_edit_distance=4)
         self.symspell.load_dictionary('models/symspell/de-100k_schulbuch.txt', 0, 1)
 
+        self.possible_per_names = ["Tim", "Marcia"]
+
+        self.checker = SpellChecker(language="de")
+        # Here load dictionary of all words from Schulbuch
+        self.checker.word_frequency.load_words(["Werthaltungen", "Identitätstypen", "Marcia", "Sprechblase", "Sprechblasen", "Selbstwert", "Arzt", "vgl", "vgl.", 
+                                                "Identitätsmodell", "Fachoberschule", "Moratoriumsidentität", "Experimentierfreudigkeit", "Selbstkonzeptes", "Idealselbst", "Realselbst"
+                                                "Kunstlehrer", "Urteilsbildungen", "Beratungskonzept", "Therapeuten"])
+        
         self.tokenizer = DistilBertTokenizerFast.from_pretrained("distilbert/distilbert-base-german-cased")
         self.model = DistilBertForMaskedLM.from_pretrained("distilbert/distilbert-base-german-cased")
         
@@ -40,19 +54,6 @@ class TextCorrector(Module):
             tokenizer=self.tokenizer,
             device=0 if 'cuda' in self.device else -1
         )
-
-        self.possible_per_names = ["Tim", "Marcia"]
-
-        self.checker = SpellChecker(language="de")
-        # Here load dictionary of all words from Schulbuch
-        self.checker.word_frequency.load_words(["Werthaltungen", "Identitätstypen", "Marcia", "Sprechblase", "Sprechblasen", "Selbstwert", "Arzt", "vgl", "vgl.", 
-                                                "Identitätsmodell", "Fachoberschule", "Moratoriumsidentität", "Experimentierfreudigkeit", "Selbstkonzeptes", "Idealselbst", "Realselbst"
-                                                "Kunstlehrer", "Urteilsbildungen", "Beratungskonzept", "Therapeuten"])
-
-        self.debug = debug
-        self.debug_folder = debug_folder
-        if self.debug:
-            os.makedirs(self.debug_folder, exist_ok=True)
     
     def get_preconditions(self) -> list[str]:
         return ['text-recognizer']
@@ -116,6 +117,9 @@ class TextCorrector(Module):
 
     def process(self, data: dict) -> list:
         texts: list = data.get('text-recognizer', [])
+
+        # We have to do setup here, else it kills cuda memory... Investigate?!
+        self._setup()
 
         text = " new_line ".join(texts)
         # Fix linebreaks with wo-rd

@@ -14,13 +14,17 @@ class TextRecognizer(Module):
     def __init__(self, model_name="fhswf/TrOCR_german_handwritten", debug=False, debug_folder="debug/debug_textrecognizer"):
         super().__init__("text-recognizer")
 
-        self.processor = TrOCRProcessor.from_pretrained(model_name)
-        self.model = VisionEncoderDecoderModel.from_pretrained(model_name)
-        self.model.to(torch.device("mps"))
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.model_name = model_name
         self.debug = debug
         self.debug_folder = debug_folder
         if self.debug:
             os.makedirs(self.debug_folder, exist_ok=True)
+
+    def _setup(self):
+        self.processor = TrOCRProcessor.from_pretrained(self.model_name)
+        self.model = VisionEncoderDecoderModel.from_pretrained(self.model_name)
+        self.model.to(self.device)
     
     def get_preconditions(self) -> list[str]:
         return ['line-cropper']
@@ -28,6 +32,9 @@ class TextRecognizer(Module):
     def process(self, data: dict) -> list:
         #images: list = data.get('line-cropper', [])
         images: list = data.get('line-prepared', [])
+
+        # We have to do setup here, else it kills cuda memory... Investigate?!
+        self._setup()
 
         texts = []
         debug_log = []

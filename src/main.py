@@ -2,10 +2,8 @@ import os
 
 from pipelines.cv_pipeline import CVPipeline
 from modules.red_remover import RedRemover
-from modules.horizontal_cutter import HorizontalCutter
 from modules.horizontal_cutter_line_detect import HorizontalCutterLineDetect
 from modules.strikethrough_cleaner import StrikeThroughCleaner
-from modules.line_denoiser import LineDenoiser
 from modules.line_cropper import LineCropper
 from modules.line_prepare_recognizer import LinePrepareRecognizer
 from modules.text_recognizer import TextRecognizer

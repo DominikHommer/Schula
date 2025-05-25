@@ -1,3 +1,5 @@
+import torch
+
 from modules.module_base import Module
 
 class Pipeline:
@@ -23,6 +25,8 @@ class Pipeline:
             self._check_condition(module)
 
             self.data[module.module_key] = module.process(self.data)
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
 
         # Output is result of last stage
         return self.data[self.stages[-1].module_key]
