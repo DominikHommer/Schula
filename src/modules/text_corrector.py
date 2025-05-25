@@ -22,7 +22,7 @@ class TextCorrector(Module):
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.hunspell = Dictionary.from_files('models/hunspell/de_DE_frami')
         self.symspell = SymSpell(max_dictionary_edit_distance=4)
-        self.symspell.load_dictionary('models/symspell/de-100k.txt', 0, 1)
+        self.symspell.load_dictionary('models/symspell/de-100k_schulbuch.txt', 0, 1)
 
         self.tokenizer = DistilBertTokenizerFast.from_pretrained("distilbert/distilbert-base-german-cased")
         self.model = DistilBertForMaskedLM.from_pretrained("distilbert/distilbert-base-german-cased")
@@ -211,7 +211,7 @@ class TextCorrector(Module):
                             canditates.append(suggest)
 
                 amount = 0
-                for suggest in self.symspell.lookup(original_word, Verbosity.CLOSEST, max_edit_distance=4):
+                for suggest in self.symspell.lookup(original_word, Verbosity.CLOSEST, max_edit_distance=4, transfer_casing=True):
                     if suggest.term not in canditates and suggest.term is not original_word:
                         amount += 1
                         if amount <= 3:
@@ -264,7 +264,7 @@ class TextCorrector(Module):
                     lev = ratio(original_word.lower(), w.lower())
 
                     if jaro == 0 or lev == 0:
-                        print("No similarity: ", original_word, w)
+                        continue
 
                     proportion = length  / org_length
                     if length > org_length:
