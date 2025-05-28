@@ -44,5 +44,6 @@ class RedRemover(Module):
             debug_path = os.path.join(self.debug_folder, "debug_redremover.png")
             cv2.imwrite(debug_path, result)
             print(f"[RedRemover] Debug-Bild gespeichert in: {debug_path}")
+
         return result
 
