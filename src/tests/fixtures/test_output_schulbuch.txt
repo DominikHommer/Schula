@@ -1,0 +1,50 @@
+
+
+=== Seite 1 ===
+
+{
+  "page_number": 16,
+  "title": "18 Wissenschaftliche Grundlagen der Pädagogik und Psychologie",
+  "text_blocks": [
+    {
+      "heading": null,
+      "paragraphs": [
+        "„Ein Mensch [...] reagiert nicht einfach auf äußere Einflüsse, sondern er verfolgt Ziele, hat [...] Erwartungen, Befürchtungen. Um also menschliches Tun zu erfassen, sind damit naturwissenschaftliche Verfahren nicht ausreichend, sondern menschliches Tun ist [...] zu verstehen.“ (König, 1997, S. 325)"
+      ]
+    },
+    {
+      "heading": "Verstehen heißt, das Ziel, den Zweck menschlichen Verhaltens und Erlebens und dessen Sinnzusammenhang zu erfassen.",
+      "paragraphs": [
+        "Auch über das Erfassen von Sinn- und Bedeutungszusammenhängen haben Wissenschaftler Annahmen über nicht beobachtbare Prozesse im Menschen, also Theorien, aufgestellt. Sie haben im Gegensatz zum Erklären die Aufgabe, den Sinn- und Bedeutungszusammenhang einer Gegebenheit verstehen zu können.",
+        "Eine solche Theorie, die zielgerichtetes Verhalten eines Menschen „ausdeutet“, ist die personenzentrierte Theorie von Carl R. Rogers, die in Band 2, Kapitel 12 dargestellt ist.",
+        "Theorie aus der Sichtweise des Verstehens ist dementsprechend die Bezeichnung für ein Gefüge von sinnvoll aufeinander bezogenen Annahmen über nicht beobachtbare Prozesse im Menschen, um den Sinn- und Bedeutungszusammenhang einer Gegebenheit darzulegen.",
+        "Mithilfe des Verstehens können Anweisungen für das praktische Handeln gegeben werden. Verstehen bezieht sich jedoch nicht nur auf das menschliche Handeln in einer gegebenen Situation, sondern auf ganze Epochen in Vergangenheit und Gegenwart mitsamt den dort gültigen Ziel- und Normvorstellungen.",
+        "Um dem Menschen in seiner Ganzheit gerecht zu werden, versucht die Psychologie einerseits Ursache-Wirkungs-Zusammenhänge mithilfe von Gesetzmäßigkeiten und Theorien zu erklären, andererseits zielgerichtetes Verhalten bzw. Handeln durch das Herausfinden von Sinnzusammenhängen zu verstehen."
+      ]
+    },
+    {
+      "heading": null,
+      "paragraphs": [
+        "„Die Natur erklären wir, das Seelenleben verstehen wir.“ (Dilthey, 1964, S. 144)"
+      ]
+    }
+  ],
+  "infographics": [
+    {
+      "title": null,
+      "content": [
+        "Wirklichkeit",
+        "Aufgabe",
+        "Ziel",
+        "Menschliches Erleben und Verhalten sind ursächlich bedingt.",
+        "Herstellen von Ursache-Wirkungs-Zusammenhängen",
+        "Erklären",
+        "Menschliches Erleben und Verhalten sind durch Ziele bedingt.",
+        "Erkennen von Sinn- und Bedeutungszusammenhängen",
+        "Verstehen"
+      ]
+    }
+  ],
+  "materials_links": [],
+  "raw_text": "18 Wissenschaftliche Grundlagen der Pädagogik und Psychologie\n\n„Ein Mensch [...] reagiert nicht einfach auf äußere Einflüsse, sondern er verfolgt Ziele, hat [...] Erwartungen, Befürchtungen. Um also menschliches Tun zu erfassen, sind damit naturwissenschaftliche Verfahren nicht ausreichend, sondern menschliches Tun ist [...] zu verstehen.“ (König, 1997, S. 325)\n\nVerstehen heißt, das Ziel, den Zweck menschlichen Verhaltens und Erlebens und dessen Sinnzusammenhang zu erfassen.\n\nAuch über das Erfassen von Sinn- und Bedeutungszusammenhängen haben Wissenschaftler Annahmen über nicht beobachtbare Prozesse im Menschen, also Theorien, aufgestellt. Sie haben im Gegensatz zum Erklären die Aufgabe, den Sinn- und Bedeutungszusammenhang einer Gegebenheit verstehen zu können.\n\nEine solche Theorie, die zielgerichtetes Verhalten eines Menschen „ausdeutet“, ist die personenzentrierte Theorie von Carl R. Rogers, die in Band 2, Kapitel 12 dargestellt ist.\n\nTheorie aus der Sichtweise des Verstehens ist dementsprechend die Bezeichnung für ein Gefüge von sinnvoll aufeinander bezogenen Annahmen über nicht beobachtbare Prozesse im Menschen, um den Sinn- und Bedeutungszusammenhang einer Gegebenheit darzulegen.\n\nMithilfe des Verstehens können Anweisungen für das praktische Handeln gegeben werden. Verstehen bezieht sich jedoch nicht nur auf das menschliche Handeln in einer gegebenen Situation, sondern auf ganze Epochen in Vergangenheit und Gegenwart mitsamt den dort gültigen Ziel- und Normvorstellungen.\n\nUm dem Menschen in seiner Ganzheit gerecht zu werden, versucht die Psychologie einerseits Ursache-Wirkungs-Zusammenhänge mithilfe von Gesetzmäßigkeiten und Theorien zu erklären, andererseits zielgerichtetes Verhalten bzw. Handeln durch das Herausfinden von Sinnzusammenhängen zu verstehen.\n\n„Die Natur erklären wir, das Seelenleben verstehen wir.“ (Dilthey, 1964, S. 144)\n\nWirklichkeit\nAufgabe\nZiel\nMenschliches Erleben und Verhalten sind ursächlich bedingt.\nHerstellen von Ursache-Wirkungs-Zusammenhängen\nErklären\nMenschliches Erleben und Verhalten sind durch Ziele bedingt.\nErkennen von Sinn- und Bedeutungszusammenhängen\nVerstehen"
+}
