@@ -1,3 +1,5 @@
+import typing
+
 class Module:
     module_key=None
     
@@ -10,5 +12,5 @@ class Module:
     def get_preconditions(self) -> list[str]:
         raise Exception("Please define get_preconditions")
     
-    def process(self, data: dict) -> any:
+    def process(self, data: dict) -> typing.Any:
         raise Exception("Please define process")

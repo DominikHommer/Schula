@@ -12,7 +12,7 @@ class LineCropper(Module):
     """
     def __init__(self, padding=10, h_desired = 128, debug=False, debug_folder="debug/debug_linecropper"):
         super().__init__("line-cropper")
-        
+
         self.h_desired = h_desired
         self.padding = padding
         self.debug = debug
@@ -22,7 +22,7 @@ class LineCropper(Module):
 
     def get_preconditions(self) -> list[str]:
         return ['horizontal-cutter']
-    
+
     def process(self, data: dict) -> list:
         sections: list = data.get('horizontal-cutter', [])
 
@@ -33,7 +33,7 @@ class LineCropper(Module):
             kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
             clean = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
             contours, _ = cv2.findContours(clean, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            
+
             if len(contours) == 0:
                 print(f"[LineCropper] Keine Konturen gefunden in Abschnitt {idx}")
                 continue
@@ -66,4 +66,5 @@ class LineCropper(Module):
                     print(f"[LineCropper] Upscaled Debug-Bild gespeichert: {debug_path}")
 
             cropped_images.append(cropped)
+
         return cropped_images

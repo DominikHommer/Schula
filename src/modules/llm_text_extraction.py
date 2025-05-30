@@ -1,7 +1,7 @@
 import os
 from langchain_core.messages import SystemMessage
 
-from libs.LanguageClient import LanguageClient
+from libs.language_client import LanguageClient
 from .llm_module_base import LLMModule
 
 class LLMExtraction(LLMModule):

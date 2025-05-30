@@ -1,8 +1,10 @@
 import os
-import numpy as np
+from typing_extensions import deprecated
 import cv2
+import numpy as np
 from .module_base import Module
 
+@deprecated("Please use HorizontalCutterLineDetect")
 class HorizontalCutter(Module):
     """
     Schneidet ein Bild horizontal in Abschnitte, indem graue Zeilen gefunden 

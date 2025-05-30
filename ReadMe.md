@@ -15,6 +15,9 @@ Install in extra step (somehow it does not work in requirements file):
 
 - Run `pylint src/` to find errors and fix them accordingly.
 - Documentation can be found here: https://docs.pylint.org/
+- Optional:
+- Run `mypy src/` to find type check errors.
+- Documentation can be found here: https://mypy.readthedocs.io/en/latest/getting_started.html
 
 ## Unit Tests
 

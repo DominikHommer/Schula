@@ -1,7 +1,7 @@
 import streamlit as st
 from langchain_core.messages import AIMessage, HumanMessage
 
-from libs.LanguageClient import LanguageClient
+from libs.language_client import LanguageClient
 
 from pipelines.pdf_processor import PdfProcessorPipeline
 from pipelines.llm_extractor import LLMTextExtractorPipeline

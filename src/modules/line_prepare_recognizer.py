@@ -4,6 +4,10 @@ import numpy as np
 from .module_base import Module
 
 class LinePrepareRecognizer(Module):
+    """
+    Prepares a line image for the text recognizer
+    Currently only converts color into a blue text color
+    """
     def __init__(self, debug=False, debug_folder="debug/debug_lineprepared"):
         super().__init__("line-prepared")
         
@@ -15,7 +19,10 @@ class LinePrepareRecognizer(Module):
     def get_preconditions(self) -> list[str]:
         return ['line-cropper']
     
-    def grayscale_to_blue(self, image_gray, text_color=(180, 0, 0)):
+    def grayscale_to_blue(self, image_gray: np.ndarray, text_color=(180, 0, 0)):
+        """
+        Convert image into blue text
+        """
         threshold = 180
         color_img = np.ones((*image_gray.shape, 3), dtype=np.uint8) * 255
         text_mask = image_gray < threshold

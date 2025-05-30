@@ -1,5 +1,5 @@
 from modules.llm_text_extraction import LLMExtraction
-from libs.LanguageClient import LanguageClient
+from libs.language_client import LanguageClient
 
 from .llm_pipeline import LLMPipeline
 

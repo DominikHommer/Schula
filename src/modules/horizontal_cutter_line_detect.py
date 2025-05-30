@@ -1,8 +1,8 @@
 import os
-import numpy as np
-import cv2
 import math
 import statistics
+import cv2
+import numpy as np
 from .module_base import Module
 
 class HorizontalCutterLineDetect(Module):
@@ -84,11 +84,8 @@ class HorizontalCutterLineDetect(Module):
             start = cut_positions[i]
             end = cut_positions[i + self.combine_amount_of_lines] + 15 # To get lower case g,y,etc...
 
-            if start < 0:
-                start = 0
-
-            if end > height:
-                end = height
+            start = max(start, 0)
+            end = min(end, height)
 
             sec = original[start:end, :, :]
             if sec.shape[0] > self.min_height:
@@ -105,6 +102,24 @@ class HorizontalCutterLineDetect(Module):
                 sections.append(sec)
         
         return sections
+
+    def _get_segments(self, raw) -> list:
+        if raw is None:
+            print("[HorizontalCutterLineDetect] Keine Linien gefunden.")
+            return []
+
+        segments = []
+        for seg in raw:
+            x1, y1, x2, y2 = seg[0]
+            angle = math.atan2(y2 - y1, x2 - x1)
+            if abs(angle) <= self.angle_tol or abs(abs(angle) - math.pi) <= self.angle_tol:
+                segments.append((x1, y1, x2, y2))
+        
+        if not segments or len(segments) < 10:
+            print("[HorizontalCutterLineDetect] Keine oder zu wenige horizontalen Segmente gefunden.")
+            return []
+        
+        return segments
 
     def process(self, data: dict) -> list:
         original: np.ndarray = data['red-remover']
@@ -129,23 +144,8 @@ class HorizontalCutterLineDetect(Module):
             canny_aperture_size=3,
             do_merge=True
         )
-        raw = fld.detect(gray)
-        if raw is None:
-            print("[HorizontalCutterLineDetect] Keine Linien gefunden.")
-            return []
-
-        segments = []
-        for seg in raw:
-            x1, y1, x2, y2 = seg[0]
-            angle = math.atan2(y2 - y1, x2 - x1)
-            if abs(angle) <= self.angle_tol or abs(abs(angle) - math.pi) <= self.angle_tol:
-                segments.append((x1, y1, x2, y2))
-        if not segments:
-            print("[HorizontalCutterLineDetect] Keine horizontalen Segmente gefunden.")
-            return []
-
-        if len(segments) < 10:
-            print("[HorizontalCutterLineDetect] Zu wenige horizontale Segmente gefunden.")
+        segments = self._get_segments(fld.detect(gray))
+        if len(segments) == 0:
             return []
 
         mid_ys = sorted((y1 + y2) / 2 for x1, y1, x2, y2 in segments)
@@ -200,4 +200,3 @@ class HorizontalCutterLineDetect(Module):
             print(f"[HorizontalCutterLineDetect] Debug-Bild gespeichert in: {dbg_path}")
 
         return self._cut_out(cut_positions, original)
-

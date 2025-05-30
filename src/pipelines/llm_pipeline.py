@@ -1,5 +1,5 @@
 from .pipeline import Pipeline
-from libs.LanguageClient import LanguageClient
+from libs.language_client import LanguageClient
 
 class LLMPipeline(Pipeline):
     def __init__(self, llmClient: LanguageClient, input_data: dict = {}):

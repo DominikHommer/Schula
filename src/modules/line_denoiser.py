@@ -1,8 +1,9 @@
 import os
-import numpy as np
+from typing_extensions import deprecated
 import cv2
-from .module_base import Module
+import numpy as np
 import tensorflow
+from .module_base import Module
 from tensorflow.keras.models import load_model
 
 def weighted_mse(y_true, y_pred):
@@ -26,10 +27,8 @@ def weighted_mse(y_true, y_pred):
     weighted_error = error * mask
     return tensorflow.reduce_mean(weighted_error)
 
+@deprecated("Denoising not optimized for this problem. Do not use!")
 class LineDenoiser(Module):
-    """
-    
-    """
     def __init__(self, debug=False, debug_folder="debug/debug_line_denoiser/"):
         super().__init__("line-denoiser")
         
