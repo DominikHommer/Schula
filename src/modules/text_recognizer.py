@@ -42,7 +42,7 @@ class TextRecognizer(Module):
         for idx, img in enumerate(images):
             pil_img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
             inputs = self.processor(images=pil_img, return_tensors="pt")
-            pixel_values = inputs.pixel_values.to(torch.device("mps"))
+            pixel_values = inputs.pixel_values.to(torch.device(self.device))
             generated_ids = self.model.generate(pixel_values)
             text = self.processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
             texts.append(text)
