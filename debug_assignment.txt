@@ -1,0 +1,27 @@
+
+
+=== Seite 1 ===
+
+{
+  "title": "2. Schulaufgabe im Fach Pädagogik/Psychologie",
+  "subject": "Pädagogik/Psychologie",
+  "grade": null,
+  "instructions": "Bitte beachten Sie, dass zur Bearbeitung der Aufgaben die Weiterentwicklung der Situation, sowie die Zuhilfenahme der Anlage (Sprechblasen) erforderlich ist.",
+  "tasks": [
+    {
+      "number": 1,
+      "title": null,
+      "instruction": "Verdeutlichen Sie Tims Identitätsstatus auf der Grundlage des Identitätsmodells nach Marcia.",
+      "subtasks": [],
+      "material_hint": null
+    },
+    {
+      "number": 2,
+      "title": null,
+      "instruction": "Die Bildung des Selbstkonzepts steht in engem Zusammenhang mit dem Verhalten von Bezugspersonen. Erklären Sie mithilfe relevanter Annahmen der personenzentrierten Theorie nach Rogers, wie sich ein starres Selbstkonzept von Tim entwickeln konnte.",
+      "subtasks": [],
+      "material_hint": null
+    }
+  ],
+  "raw_text": null
+}
