@@ -1,5 +1,7 @@
+import typing
 from .module_base import Module
 from langchain_core.messages import SystemMessage
+from libs.language_client import LanguageClient
 
 class LLMModule(Module):
     def __init__(self, module_key = None):
@@ -11,5 +13,5 @@ class LLMModule(Module):
     def get_structured_output(self):
         raise Exception("Please define get_structured_output")
     
-    def process(self, data: dict) -> any:
+    def process(self, data: dict, llm: LanguageClient) -> typing.Any:
         raise Exception("Please define process")

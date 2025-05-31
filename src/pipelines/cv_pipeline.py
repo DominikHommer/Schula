@@ -29,7 +29,7 @@ class CVPipeline(Pipeline):
                 images = convert_from_path(input)
             
                 for i, img in enumerate(images):
-                    path = f"{os.path.dirname(input)}/image_{i}.png"
+                    path = os.path.join("data", "local", f"image_{i}.png")
                     img.save(path)
                     path_inputs.append(path)
             else:

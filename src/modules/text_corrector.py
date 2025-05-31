@@ -25,7 +25,7 @@ class TextCorrector(Module):
         if self.debug:
             os.makedirs(self.debug_folder, exist_ok=True)
 
-    def _setup(self):
+    def _warmup(self):
         self.hunspell = Dictionary.from_files('models/hunspell/de_DE_frami')
         self.symspell = SymSpell(max_dictionary_edit_distance=4)
         self.symspell.load_dictionary('models/symspell/de-100k_schulbuch.txt', 0, 1)
@@ -117,9 +117,6 @@ class TextCorrector(Module):
 
     def process(self, data: dict) -> list:
         texts: list = data.get('text-recognizer', [])
-
-        # We have to do setup here, else it kills cuda memory... Investigate?!
-        self._setup()
 
         text = " new_line ".join(texts)
         # Fix linebreaks with wo-rd

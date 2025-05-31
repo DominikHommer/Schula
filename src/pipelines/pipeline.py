@@ -24,6 +24,10 @@ class Pipeline:
         for module in self.stages:
             self._check_condition(module)
 
+            # Init of models should be moved there
+            if hasattr(module, '_warmup'):
+                module._warmup()
+
             self.data[module.module_key] = module.process(self.data)
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()

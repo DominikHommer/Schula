@@ -1,6 +1,7 @@
 import os
 import cv2
 import numpy as np
+from PIL import Image, ImageFilter, ImageOps
 from .module_base import Module
 
 class LinePrepareRecognizer(Module):
@@ -23,7 +24,7 @@ class LinePrepareRecognizer(Module):
         """
         Convert image into blue text
         """
-        threshold = 180
+        threshold = 210
         color_img = np.ones((*image_gray.shape, 3), dtype=np.uint8) * 255
         text_mask = image_gray < threshold
 
@@ -66,18 +67,12 @@ class LinePrepareRecognizer(Module):
 
         cropped_images = []
         for idx, img in enumerate(images):
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            denoised = cv2.fastNlMeansDenoising(gray, h=20)
+            image = Image.fromarray(img, 'RGB')
+            gray = ImageOps.grayscale(image)
+            enhanced = ImageOps.autocontrast(gray)
+            img_np = np.array(enhanced)
 
-            alpha = 1.5
-            beta = 0.5
-            contrast_enhanced = cv2.convertScaleAbs(denoised, alpha=alpha, beta=beta)
-
-            sharpen_kernel = np.array([[0, -1, 0],
-                                    [-1, 5, -1],
-                                    [0, -1, 0]])
-            sharpened = cv2.filter2D(contrast_enhanced, -1, sharpen_kernel)
-            sharpened = self.grayscale_to_blue(sharpened)
+            sharpened = self.grayscale_to_blue(img_np)
 
             if self.debug:
                 debug_path = os.path.join(self.debug_folder, f"debug_section_{idx}.png")

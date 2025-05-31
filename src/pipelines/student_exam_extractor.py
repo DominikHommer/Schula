@@ -13,21 +13,21 @@ from libs.file_helper import save_temp_file
 import os
 import streamlit as st
 
-class PNGProcessorPipeline(CVPipeline):
+class StudentExamProcessorPipeline(CVPipeline):
     """
-    Pdf Processing Pipeline mit vordefinierten Stages.
+    Processing Pipeline mit vordefinierten Stages für die Schulaufgabe des Schülers.
     Sollte im Streamlit Kontext verwendet werden
     """
     def __init__(self, input_data: dict = {}):
         super().__init__(input_data)
 
-        self.add_stage(RedRemover(debug=True))
-        self.add_stage(HorizontalCutterLineDetect(debug=True))
-        self.add_stage(StrikeThroughCleaner(debug=True))
-        self.add_stage(LineCropper(debug=True))
-        self.add_stage(LinePrepareRecognizer(debug=True))
-        self.add_stage(TextRecognizer(debug=True))
-        self.add_stage(TextCorrector(debug=True))
+        self.add_stage(RedRemover(debug=False))
+        self.add_stage(HorizontalCutterLineDetect(debug=False))
+        self.add_stage(StrikeThroughCleaner(debug=False))
+        self.add_stage(LineCropper(debug=False))
+        self.add_stage(LinePrepareRecognizer(debug=True)) # sometimes good sometimes bad :/ 
+        self.add_stage(TextRecognizer(debug=False))
+        self.add_stage(TextCorrector(debug=False))
 
     def process_streamlit(self, uploaded_file, file_type):
         attribute_id = f"{file_type}_file_id"

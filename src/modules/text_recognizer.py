@@ -11,6 +11,8 @@ class TextRecognizer(Module):
     Erkennt den Text und erstellt optional ein Debug-Log, das die 
     erkannten Ergebnisse auflistet.
     """
+    _model_cache: dict[str, tuple[TrOCRProcessor, VisionEncoderDecoderModel]] = {}
+
     def __init__(self, model_name="fhswf/TrOCR_german_handwritten", debug=False, debug_folder="debug/debug_textrecognizer"):
         super().__init__("text-recognizer")
 
@@ -18,32 +20,44 @@ class TextRecognizer(Module):
         self.model_name = model_name
         self.debug = debug
         self.debug_folder = debug_folder
+
         if self.debug:
             os.makedirs(self.debug_folder, exist_ok=True)
 
-    def _setup(self):
-        self.processor = TrOCRProcessor.from_pretrained(self.model_name)
-        self.model = VisionEncoderDecoderModel.from_pretrained(self.model_name)
-        self.model.to(self.device)
+    def _warmup(self):
+        self.processor, self.model = self._get_processor_and_model(self.model_name)
+
+    @classmethod
+    def _get_processor_and_model(self, model_name: str) -> tuple[TrOCRProcessor, VisionEncoderDecoderModel]:
+        """
+        Lädt Prozessor und Modell nur einmal pro model_name und cached sie.
+        """
+        if model_name not in self._model_cache:
+            processor = TrOCRProcessor.from_pretrained(model_name)
+            model = VisionEncoderDecoderModel.from_pretrained(model_name)
+            self._model_cache[model_name] = (processor, model)
+
+        return self._model_cache[model_name]
     
     def get_preconditions(self) -> list[str]:
-        return ['line-cropper']
+        return ['line-prepared']
     
     def process(self, data: dict) -> list:
-        #images: list = data.get('line-cropper', [])
         images: list = data.get('line-prepared', [])
-
-        # We have to do setup here, else it kills cuda memory... Investigate?!
-        self._setup()
 
         texts = []
         debug_log = []
 
+        self.model.to(self.device)
+
         for idx, img in enumerate(images):
             pil_img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
             inputs = self.processor(images=pil_img, return_tensors="pt")
-            pixel_values = inputs.pixel_values.to(torch.device("mps"))
-            generated_ids = self.model.generate(pixel_values)
+            pixel_values = inputs.pixel_values.to(torch.device(self.device))
+
+            with torch.no_grad():
+                generated_ids = self.model.generate(pixel_values)
+
             text = self.processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
             texts.append(text)
             print(f"[TextRecognizer] Erkannt für Bild {idx}: {text}")

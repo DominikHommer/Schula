@@ -5,11 +5,11 @@ from libs.language_client import LanguageClient
 
 from pipelines.pdf_processor import PdfProcessorPipeline
 from pipelines.llm_extractor import LLMTextExtractorPipeline
-#from pipelines.png_processor import PNGProcessorPipeline
+from pipelines.student_exam_extractor import StudentExamProcessorPipeline
 
 llmClient = LanguageClient()
+_studenExamProcessorPipeline = StudentExamProcessorPipeline()
 _pdfProcessorPipeline = PdfProcessorPipeline()
-#_pngProcessorPipeline = PNGProcessorPipeline()
 
 def app_session_init():
     # Initialize session state keys if they don't exist
@@ -83,7 +83,7 @@ def run():
 
     # --- Process Student File (only if changed and not processed) ---
     if uploaded_student_file is not None:
-        _pdfProcessorPipeline.process_streamlit(uploaded_student_file, "student")
+        _studenExamProcessorPipeline.process_streamlit(uploaded_student_file, "student")
 
     # --- Process Task File (only if changed and not processed) ---
     if uploaded_task_file is not None:
@@ -98,7 +98,7 @@ def run():
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.session_state.student_file_processed:
-            st.image(uploaded_student_file, caption="Klausur-Scan", use_container_width=True)
+            #st.image(uploaded_student_file, caption="Klausur-Scan", use_container_width=True)
             st.text_area("Extrahierter Klausurtext", st.session_state.student_text, height=150, key="student_text_area")
         else:
             st.info("Bitte Klausur-Scan hochladen.")
