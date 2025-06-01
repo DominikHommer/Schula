@@ -1,4 +1,7 @@
 import streamlit as st
+from pdf2image import convert_from_bytes
+import json
+
 from langchain_core.messages import AIMessage, HumanMessage
 
 from libs.language_client import LanguageClient
@@ -90,7 +93,7 @@ def run():
         _pdfProcessorPipeline.process_streamlit(uploaded_task_file, "task")
     
     # --- Process Solution File (only if changed and not processed) ---
-    if uploaded_task_file is not None:
+    if uploaded_solution_file is not None:
         _pdfProcessorPipeline.process_streamlit(uploaded_solution_file, "solution")
 
     # --- Display Processed Text and Images ---
@@ -105,16 +108,75 @@ def run():
 
     with col2:
         if st.session_state.task_file_processed:
-            st.image(uploaded_task_file, caption="Aufgabenstellung", use_container_width=True)
-            st.text_area("Extrahierter Aufgabentext", st.session_state.task_text, height=150, key="teacher_text_area")
+            try:
+                images = convert_from_bytes(uploaded_task_file.read(), first_page=1, last_page=1)
+                st.image(images[0], caption="Aufgabenstellung", use_container_width=True)
+            except Exception as e:
+                st.warning(f"Fehler beim Anzeigen der Vorschau: {e}")
+
+            try:
+                data = json.loads(st.session_state.task_text)
+                if isinstance(data, dict):
+                    data = [data]
+
+                for block_idx, sheet in enumerate(data, 1):
+                    st.write(f"**Titel:** {sheet.get('title', 'Kein Titel')}")
+                    st.write(f"**Fach:** {sheet.get('subject', 'Unbekannt')}")
+                    st.write(f"**Hinweise:** {sheet.get('instructions', '-')}")
+
+                    if "tasks" in sheet and sheet["tasks"]:
+                        st.markdown("#### Aufgaben:")
+                        for task in sheet["tasks"]:
+                            st.markdown(f"**Aufgabe {task.get('number', '?')}:** {task.get('instruction', '')}")
+            except Exception as e:
+                st.warning(f"Fehler beim Anzeigen der Aufgabenstruktur: {e}")
+                st.text_area("Extrahierter Aufgabentext (roh)", st.session_state.task_text, height=150, key="task_text_area")
+
         else:
-             st.info("Bitte Aufgabenstellung hochladen.")
+            st.info("Bitte Aufgabenstellung hochladen.")
+
+
     with col3:
         if st.session_state.solution_file_processed:
-            st.image(uploaded_solution_file, caption="Musterlösung", use_container_width=True)
-            st.text_area("Extrahierter Lösungstext", st.session_state.solution_text, height=150, key="teacher_text_area")
+            # Erste Seite als Vorschau anzeigen
+            try:
+                images = convert_from_bytes(uploaded_solution_file.read(), first_page=1, last_page=1)
+                st.image(images[0], caption="Musterlösung", use_container_width=True)
+            except Exception as e:
+                st.warning(f"Fehler beim Anzeigen der Vorschau: {e}")
+
+            # Strukturierte Darstellung der Musterlösung
+            try:
+                data = json.loads(st.session_state.solution_text)
+                if isinstance(data, dict):
+                    data = [data]
+
+                for block_idx, block in enumerate(data, 1):
+                    if block.get("assignment_title"):
+                        st.write(f"**Titel:** {block['assignment_title']}")
+                    if block.get("subject"):
+                        st.write(f"**Fach:** {block['subject']}")
+
+                    if block.get("solutions"):
+                        for idx, solution in enumerate(block["solutions"], 1):
+                            st.markdown(f"#### Aufgabe {solution.get('number', idx)}")
+                            if solution.get("title"):
+                                st.write(f"**Thema:** {solution['title']}")
+                            if solution.get("solution_text"):
+                                st.write(solution["solution_text"])
+                            for sub in solution.get("subsolutions", []):
+                                label = sub.get("label")
+                                content = sub.get("solution", "")
+                                if label:
+                                    st.write(f"- **{label}** {content}")
+                                else:
+                                    st.write(f"- {content}")
+            except Exception as e:
+                st.warning(f"Fehler beim Anzeigen der Lösung: {e}")
+                st.text_area("Extrahierter Lösungstext (roh)", st.session_state.solution_text, height=150, key="teacher_solution_area")
+
         else:
-             st.info("Bitte Musterlösung hochladen.")
+            st.info("Bitte Musterlösung hochladen.")
 
 
     st.divider() # Separator before chat
