@@ -1,0 +1,51 @@
+
+
+=== Seite 1 ===
+
+{
+  "page_number": 16,
+  "title": "18 Wissenschaftliche Grundlagen der Pädagogik und Psychologie",
+  "text_blocks": [
+    {
+      "heading": null,
+      "paragraphs": [
+        "„Ein Mensch [...] reagiert nicht einfach auf äußere Einflüsse, sondern er verfolgt Ziele, hat [...] Erwartungen, Befürchtungen. Um also menschliches Tun zu erfassen, sind damit naturwissenschaftliche Verfahren nicht ausreichend, sondern menschliches Tun ist [...] zu verstehen.“ (König, 1997⁵, S. 325)",
+        "Verstehen heißt, das Ziel, den Zweck menschlichen Verhaltens und Erlebens und dessen Sinnzusammenhang zu erfassen.",
+        "Auch über das Erfassen von Sinn- und Bedeutungszusammenhängen haben Wissenschaftler Annahmen über nicht beobachtbare Prozesse im Menschen, also Theorien, aufgestellt. Sie haben im Gegensatz zum Erklären die Aufgabe, den Sinn- und Bedeutungszusammenhang einer Gegebenheit verstehen zu können.",
+        "Eine solche Theorie, die zielgerichtetes Verhalten eines Menschen „ausdeutet“, ist die personenzentrierte Theorie von Carl R. Rogers, die in Band 2, Kapitel 12 dargestellt ist.",
+        "Theorie aus der Sichtweise des Verstehens ist dementsprechend die Bezeichnung für ein Gefüge von sinnvoll aufeinander bezogenen Annahmen über nicht beobachtbare Prozesse im Menschen, um den Sinn- und Bedeutungszusammenhang einer Gegebenheit darzulegen.",
+        "Mithilfe des Verstehens können Anweisungen für das praktische Handeln gegeben werden. Verstehen bezieht sich jedoch nicht nur auf das menschliche Handeln in einer gegebenen Situation, sondern auf ganze Epochen in Vergangenheit und Gegenwart mitsamt den dort gültigen Ziel- und Normvorstellungen.",
+        "Um dem Menschen in seiner Ganzheit gerecht zu werden, versucht die Psychologie einerseits Ursache-Wirkungs-Zusammenhänge mithilfe von Gesetzmäßigkeiten und Theorien zu erklären, andererseits zielgerichtetes Verhalten bzw. Handeln durch das Herausfinden von Sinnzusammenhängen zu verstehen.",
+        "„Die Natur erklären wir, das Seelenleben verstehen wir.“ (Dilthey¹, 1964², S. 144)"
+      ]
+    }
+  ],
+  "infographics": [
+    {
+      "title": null,
+      "content": [
+        "Wirklichkeit",
+        "Aufgabe",
+        "Ziel"
+      ]
+    },
+    {
+      "title": null,
+      "content": [
+        "Menschliches Erleben und Verhalten sind ursächlich bedingt.",
+        "Herstellen von Ursache-Wirkungs-Zusammenhängen",
+        "Erklären"
+      ]
+    },
+    {
+      "title": null,
+      "content": [
+        "Menschliches Erleben und Verhalten sind durch Ziele bedingt.",
+        "Erkennen von Sinn- und Bedeutungszusammenhängen",
+        "Verstehen"
+      ]
+    }
+  ],
+  "materials_links": [],
+  "raw_text": null
+}

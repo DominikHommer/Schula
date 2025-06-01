@@ -1,0 +1,95 @@
+
+
+=== Seite 1 ===
+
+{
+  "assignment_title": "Erwartungshorizont für die 2. Schulaufgabe in Pädagogik/Psychologie am 04.03.24",
+  "subject": "Pädagogik/Psychologie",
+  "solutions": [
+    {
+      "number": 1,
+      "title": null,
+      "solution_text": "Kurze Hinführung: Fachliche Kenntnisse und deren Anwendung",
+      "subsolutions": [
+        {
+          "label": "Definition Identität",
+          "solution": "Identität: Selbstverständnis eines Menschen als einmalige bzw. unverwechselbare Person, bezogen auf die eigene und die soziale Wahrnehmung."
+        },
+        {
+          "label": "Typen nach Marcia",
+          "solution": "alle Typen lediglich nennen: erarbeitete Identität, übernommene Identität, kritische Identität/Moratoriumsidentität, diffuse Identität"
+        },
+        {
+          "label": "Identitätsstatus nach Marcia",
+          "solution": "Nach Marcia umfasst jeder Identitätsstatus zwei Dimensionen, die unterschiedlich ausgeprägt sein können: Ausmaß der Verpflichtung gegenüber Werthaltungen (hoch/niedrig), Ausmaß der Experimentierfreudigkeit gegenüber Werthaltungen (hoch/niedrig)"
+        }
+      ]
+    },
+    {
+      "number": null,
+      "title": null,
+      "solution_text": "Tim befindet sich im Lebensbereich Schule und Freund und momentan im Stadium der kritischen Identität.",
+      "subsolutions": [
+        {
+          "label": "Beschreibung der kritischen Identität (Moratoriumsidentität)",
+          "solution": "Ausprobieren neuer Wertvorstellungen und Einstellungen: Tim überlegt, ob er nicht den Zweig der FOS wechseln sollte. Er kann sich nicht mit dem traditionellen Berufsverständnis, das die Eltern vorleben identifizieren. Darüber möchte er nicht mit seinen Eltern diskutieren, da er vielleicht selbstbestimmte arbeiten möchte und seiner Kunstinteresse nachgehen möchte."
+        },
+        {
+          "label": null,
+          "solution": "geringer Grad an Verpflichtung bezüglich übernommener Überzeugungen: Tim fühlt sich den Werten seiner Eltern weniger verpflichtet, er möchte nicht mit den Eltern diskutieren, da sie „eine ganz andere Vorstellung von ‚Leben und Arbeit‘ (Z.11) haben. Zudem könnte man annehmen, dass er das Lebensmodell seiner Eltern stark hinterfragt, da er sich evtl. keinen 40 Stunden/Woche in einem traditionellen Beruf arbeiten möchte."
+        },
+        {
+          "label": null,
+          "solution": "Fehlen eindeutiger Werte: Die Eltern geben bestimmte Werte vor: gute Noten/sicherer Beruf; diese Werte vertritt Tim nicht, er strebt evtl. ein anderes Lebensmodell an, hat dafür aber noch keine Vorbilder, an denen er sich orientieren könnte."
+        },
+        {
+          "label": null,
+          "solution": "intensive Suche: Tim überlegt, ob er die Schule überhaupt die Richtige für ihn ist (s.o.)"
+        },
+        {
+          "label": null,
+          "solution": "krisenhafter Situation: Tim fühlt sich niedergeschlagen und antriebslos, er hat kaum Freunde, denen er sich anvertrauen könnte, er meint, dass ihn alle für einen Looser halten."
+        }
+      ]
+    }
+  ],
+  "raw_text": null
+}
+
+=== Seite 2 ===
+
+{
+  "assignment_title": null,
+  "subject": null,
+  "solutions": [
+    {
+      "number": 2,
+      "title": null,
+      "solution_text": "Die personenzentrierte Theorie nach Carl Rogers zählt zu den Humanistischen Theorien. Das Selbstkonzept zählt neben der Aktualisierungstendenz und dem organismischen Bewertungsprozess zu den zentralen Annahmen dieser Theorie und gilt als zentrales Merkmal der menschlichen Persönlichkeit.",
+      "subsolutions": [
+        {
+          "label": "Aufgabe 2:",
+          "solution": "Kurze Hinführung, z. B. Definition Persönlichkeit"
+        },
+        {
+          "label": null,
+          "solution": "Rogers geht davon aus, dass jeder Mensch im Laufe seines Lebens ein Selbstkonzept entwickelt. Das Selbstkonzept stellt die durch Erfahrung zustande gekommene Gesamtheit aller Wahrnehmungen, Meinungen, Urteilsbildungen und Bewertungen des Individuums über sich selbst und seine Umwelt dar. Das Selbstkonzept zeigt sich zum einen im Realselbst. Das ist das tatsächliche Bild, das eine Person von sich hat, und stellt ihr Bewusstsein dar über das, was sie ist und kann. Tims Realselbst stellt sich wie folgt dar: Tim weiß, dass er kunstinteressiert ist, das ist seine Leidenschaft (Z. 3f). Er selbst hält sich aber auch für einen Looser, den keiner leiden kann. Zum anderen besteht das Selbstkonzept laut C. Rogers aus dem Idealselbst. Das Idealselbst ist das Bewusstsein einer Person darüber, wie sie gerne sein möchte und wie andere sie haben möchten. Tims Eltern möchten, dass er etwas \"Vernünftiges\" lernt und einen \"sicheren\" Job anstrebt, wie z. B. Arzt oder Ingenieur. Auch verlangen Sie von ihm gute Noten. Tim weiß, dass er künstlerisches Talent besitzt und er möchte eigentlich seine Leidenschaft zum Beruf machen. Weiterhin ist anzunehmen, dass er gerne feste Freundschaften schließen möchte, ihn aber seine Unsicherheit im Wege steht (\"Wer mag schon einen Freund als Künstler?\")"
+        },
+        {
+          "label": null,
+          "solution": "Selbstkonzepte verändern und entwickeln sich im Laufe des Lebens. Generell besteht die Tendenz, die Diskrepanz zwischen Real- und Idealselbst möglichst gering zu halten. Je nach Übereinstimmung von Realselbst und Idealselbst erlebt der Mensch einen selbstkonsistenten oder selbstinkonsistenten Zustand. Selbstkonsistenz liegt vor, wenn Real-Selbst und Ideal-Selbst miteinander stimmig und vereinbar sind. Der Grad der Übereinstimmung bestimmt, wie ausgeglichen und innerlich spannungsfrei sich der Mensch fühlt. Ein Mensch, der sich häufig selbstkonsistent erlebt, hat ein eher positives/flexibles Selbstkonzept und besitzt eine (hohe) Selbstachtung. Selbstinkonsistenz liegt vor, wenn Real-Selbst und Ideal-Selbst nicht miteinander stimmig und unvereinbar sind. Die Person ist unglücklich und unausgeglichen, wobei dieser Zustand langfristig innere Spannungen und Unzufriedenheit hervorrufen kann. Ein Mensch, der sich häufig inkonsistent erlebt, hat ein eher negatives Selbstkonzept und besitzt wenig Selbstachtung. Tim erlebt Inkonsistenz und besitzt ein eher negatives Selbstkonzept. Dies wird z. B. an der Aussage deutlich, dass ihn keiner mag und ihn alle für einen Looser halten. Zudem fühlt er sich antriebslos und sehr niedergeschlagen (Z. 10ff)."
+        }
+      ]
+    }
+  ],
+  "raw_text": null
+}
+
+=== Seite 3 ===
+
+{
+  "assignment_title": null,
+  "subject": null,
+  "solutions": [],
+  "raw_text": "unheimlich wichtig seien. Er beobachtet aber auch, dass ihn der Kunstlehrer immer wieder lobt für sein Talent. Zudem macht Tim in der Schule evtl. die Erfahrung, dass er aufgrund seiner Zurückhaltung schwierig Freunde und Anschluss in der Klasse findet. Er glaubt, dass ihn alle für einen Looser halten und er nichts wert sei.\n\nForderungen und Wünsche der Bezugspersonen: Tims Eltern wünschen sich, dass er gute Noten schreibt, dass er Arzt oder Ingenieur wird.\n\nBeziehungsbotschaften, d. h. pos. bzw. neg. Rückmeldungen im Sinne von Gering- oder Wertschätzung durch die Bezugspersonen; diese äußert sich insb. in Wärme, Achtung und Rücksichtnahme und ist frei von Bedingungen. Es ist anzunehmen, dass Tim in seinem Leben eher GeringSchätzung erfahren hat. Die Eltern akzeptieren zwar Tims Leidenschaft, aber mit dieser könne man eben kein Geld verdienen. Zudem muss Tim immer gute Noten schreiben. Wenn der Junge versagt, wird er von seinen Eltern nicht mehr beachtet oder er muss noch mehr lernen, um von seinen Eltern anerkannt und geliebt zu werden. Tim genießt also eine Erziehung, die immer an Bedingungen (gute Noten und Leistungsbereitschaft) geknüpft ist.\n\nZuschreibungen der Bezugspersonen, d. h. Behauptungen über einen Menschen, bei der es sich meist um eine negativ bewertete Eigenschaft oder Verhaltensweise handelt. Tim sieht sich selbst als Looser und einen Freund, der nichts wert sei, wenn er im künstlerischen Bereich tätig sei. Nur wer etwas leistet, ist etwas wert.\n\nEntsprechend der Achtung, die ein Kind von seinen Bezugspersonen erfährt, so sieht es sich selbst und achtet es sich selbst.\nNach Rogers besitzt der Mensch das angeborene Grundbedürfnis nach positiver Beachtung bzw. (bedingungsloser) Wertschätzung/Akzeptanz.\n\nDamit verbunden ist auch das Bedürfnis nach Zuwendung, d. h. der Mensch hat das Bedürfnis anerkannt und geliebt zu sein. Beide Bedürfnisse stehen miteinander in Beziehung. Bewertungsbedingungen sind Wertmaßstäbe anderer Menschen, die eine Person erfüllen muss, um deren Zuneigung und Wertschätzung zu erhalten. Gehen die Bezugspersonen gering schätzend mit dem Kind um, oder knüpfen ihre Beachtung an Bewertungsbedingungen, dann wird die eigene Person wenig achten und eine geringe Selbstachtung entwickeln. Wenn Tim macht, was die Eltern erwarten, wie z. B. gute Noten schreiben, viel lernen, dann erfährt Tim Wertschätzung. Die Beachtung ist also immer an Bewertungsbedingungen geknüpft (s.o.)\n\nSelbstachtung meint die gefühlsmäßig wertende Einstellung einer Person zu sich selbst und die Wertschätzung, die eine Person für sich selbst empfindet.\n\nDie Selbstachtung hängt eng mit dem Selbstkonzept zusammen. Menschen mit überwiegend geringer Selbstachtung besitzen in der Regel ein eher starres Selbstkonzept und sind nicht in der Lage, neue Erfahrungen zu akzeptieren und in ihr Selbstkonzept zu integrieren. Tim hat also aufgrund seiner gemachten Erfahrungen eine eher geringe Selbstachtung und damit ein starres Selbstkonzept, da er die eigenen Wünsche/Bedürfnisse und somit auch die Erfahrung, dass er in Kunst/Design wirklich talentiert ist, nicht in sein Selbstkonzept integrieren. Menschen mit einem positiven Selbstkonzept können die neue Erfahrungen in ihr flexibles Selbstkonzept integrieren."
+}
