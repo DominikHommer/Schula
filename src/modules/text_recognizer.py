@@ -1,9 +1,9 @@
+import os
 import torch
 import cv2
 from PIL import Image
 from transformers import TrOCRProcessor, VisionEncoderDecoderModel
 from .module_base import Module
-import os
 
 class TextRecognizer(Module):
     """
@@ -20,6 +20,8 @@ class TextRecognizer(Module):
         self.model_name = model_name
         self.debug = debug
         self.debug_folder = debug_folder
+        self.model = None
+        self.processor = None
 
         if self.debug:
             os.makedirs(self.debug_folder, exist_ok=True)
@@ -28,16 +30,16 @@ class TextRecognizer(Module):
         self.processor, self.model = self._get_processor_and_model(self.model_name)
 
     @classmethod
-    def _get_processor_and_model(self, model_name: str) -> tuple[TrOCRProcessor, VisionEncoderDecoderModel]:
+    def _get_processor_and_model(cls, model_name: str) -> tuple[TrOCRProcessor, VisionEncoderDecoderModel]:
         """
         Lädt Prozessor und Modell nur einmal pro model_name und cached sie.
         """
-        if model_name not in self._model_cache:
+        if model_name not in cls._model_cache:
             processor = TrOCRProcessor.from_pretrained(model_name)
             model = VisionEncoderDecoderModel.from_pretrained(model_name)
-            self._model_cache[model_name] = (processor, model)
+            cls._model_cache[model_name] = (processor, model)
 
-        return self._model_cache[model_name]
+        return cls._model_cache[model_name]
     
     def get_preconditions(self) -> list[str]:
         return ['line-prepared']
@@ -47,6 +49,9 @@ class TextRecognizer(Module):
 
         texts = []
         debug_log = []
+
+        if self.model is None or self.processor is None:
+            raise Exception('Missing warmup phase')
 
         self.model.to(self.device)
 

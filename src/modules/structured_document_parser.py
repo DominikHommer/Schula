@@ -12,6 +12,9 @@ from pydantic import BaseModel
 from .module_base import Module
 
 class StructuredDocumentParser(Module):
+    """
+    Parses a document pdf into a structured json output
+    """
     def __init__(self, schema_model: Type[BaseModel], prompt: str, debug=False, debug_output="output.txt"):
         super().__init__("structured-document-parser")
         load_dotenv()
@@ -32,7 +35,8 @@ class StructuredDocumentParser(Module):
         results = []
 
         if self.debug:
-            f_out = open(self.output_path, "w", encoding="utf-8")
+            with open(self.output_path, "w", encoding="utf-8") as file:
+                f_out = file
 
         for i, page in enumerate(pages):
             print(f"[Parser] Verarbeite Seite {i+1}...")

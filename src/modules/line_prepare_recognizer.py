@@ -1,7 +1,7 @@
 import os
 import cv2
 import numpy as np
-from PIL import Image, ImageFilter, ImageOps
+from PIL import Image, ImageOps
 from .module_base import Module
 
 class LinePrepareRecognizer(Module):

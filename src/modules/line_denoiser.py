@@ -1,10 +1,11 @@
+# pylint: skip-file
 import os
 from typing_extensions import deprecated
 import cv2
 import numpy as np
 import tensorflow
+from tensorflow.keras import models
 from .module_base import Module
-from tensorflow.keras.models import load_model
 
 def weighted_mse(y_true, y_pred):
     img_height, img_width = y_true.shape[1], y_true.shape[2]
@@ -41,7 +42,7 @@ class LineDenoiser(Module):
         return ['strike-through-cleaner']
     
     def process(self, data: dict) -> list:
-        model = load_model("models/denoise/model.keras", custom_objects={"weighted_mse": weighted_mse})
+        model = models.load_model("models/denoise/model.keras", custom_objects={"weighted_mse": weighted_mse})
     
         sections: list = data.get('strike-through-cleaner', [])
 

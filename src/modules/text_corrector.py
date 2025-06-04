@@ -1,13 +1,13 @@
 import os
-from spellchecker import SpellChecker
+import re
 import torch
+from spellchecker import SpellChecker
 from transformers import (
     DistilBertTokenizerFast,
     DistilBertForMaskedLM,
     pipeline
 )
 from Levenshtein import ratio, distance
-import re
 import torch.nn.functional as F
 from spylls.hunspell import Dictionary
 from jarowinkler import jarowinkler_similarity
@@ -16,16 +16,36 @@ from symspellpy import SymSpell, Verbosity
 from .module_base import Module
 
 class TextCorrector(Module):
+    """
+    Tries to correct the recognized text by some degree
+    """
     def __init__(self, debug=False, debug_folder="debug/debug_textcorrector"):
         super().__init__("text-corrector")
 
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.debug = debug
         self.debug_folder = debug_folder
+
+        self.hunspell = None
+        self.symspell = None
+        self.possible_per_names = None
+        self.checker = None
+        self.tokenizer = None
+        self.model = None
+        self.ner = None
+        self.fill_mask = None
+
         if self.debug:
             os.makedirs(self.debug_folder, exist_ok=True)
 
     def _warmup(self):
+        spellchecker_words = []
+        with open('../models/symspell/de-100k_schulbuch.txt', "r", encoding="utf-8") as dic:
+            for line in dic:
+                parts = line.strip().split()
+                if len(parts) >= 2:
+                    spellchecker_words.append(parts[0])
+
         self.hunspell = Dictionary.from_files('models/hunspell/de_DE_frami')
         self.symspell = SymSpell(max_dictionary_edit_distance=4)
         self.symspell.load_dictionary('models/symspell/de-100k_schulbuch.txt', 0, 1)
@@ -34,9 +54,7 @@ class TextCorrector(Module):
 
         self.checker = SpellChecker(language="de")
         # Here load dictionary of all words from Schulbuch
-        self.checker.word_frequency.load_words(["Werthaltungen", "Identitätstypen", "Marcia", "Sprechblase", "Sprechblasen", "Selbstwert", "Arzt", "vgl", "vgl.", 
-                                                "Identitätsmodell", "Fachoberschule", "Moratoriumsidentität", "Experimentierfreudigkeit", "Selbstkonzeptes", "Idealselbst", "Realselbst"
-                                                "Kunstlehrer", "Urteilsbildungen", "Beratungskonzept", "Therapeuten"])
+        self.checker.word_frequency.load_words(spellchecker_words)
         
         self.tokenizer = DistilBertTokenizerFast.from_pretrained("distilbert/distilbert-base-german-cased")
         self.model = DistilBertForMaskedLM.from_pretrained("distilbert/distilbert-base-german-cased")
@@ -64,6 +82,9 @@ class TextCorrector(Module):
         post: list[str],
         candidates: list[str]
     ) -> dict[str, float]:
+        """
+        Score candidates in a batch
+        """
         mask_index_lengths: list[tuple] = []
         batch_ids = []
         for cand in candidates:
@@ -77,7 +98,7 @@ class TextCorrector(Module):
 
             # Add ids and save "masks" start and their length
             batch_ids.append(base_ids)
-            mask_index_lengths.append((cand, tokenized_pre.__len__() + 1, tokenized_cand.__len__()))
+            mask_index_lengths.append((cand, len(tokenized_pre) + 1, len(tokenized_cand)))
 
         max_len = max(len(ids) for ids in batch_ids)
         batch_tensor = torch.zeros((len(batch_ids), max_len), dtype=torch.long, device=self.device)
@@ -105,6 +126,9 @@ class TextCorrector(Module):
         return scores
 
     def _map_ner_to_per(self, ner_result: dict) -> str:
+        """
+        Create map of ner to person name
+        """
         total_names = len(self.possible_per_names)
         for per in self.possible_per_names:
             if ratio(ner_result['word'], per) > 1 / total_names:
@@ -117,6 +141,9 @@ class TextCorrector(Module):
 
     def process(self, data: dict) -> list:
         texts: list = data.get('text-recognizer', [])
+
+        if self.hunspell is None:
+            raise Exception('Warmup Phase missing')
 
         text = " new_line ".join(texts)
         # Fix linebreaks with wo-rd
@@ -132,16 +159,8 @@ class TextCorrector(Module):
         # Add space after and before symbols. Else: BERT has problems
         words = (re.sub(r'([.,!?;:()\[\]{}"“”])', r' \1 ', text)).split()
 
-        ## Algos:
-        # - Wenn Wort in pyspellchecker == original Wort, nehmen wir das Wort
-        # - Ansonsten: Lass BERT nächstes Wort predicten, lass pyspellchecker wort beheben
-        #   - Danach: Lassen wir BERT die Wörter scoren
-        #   - Danach: Gewichten wir den Score mit der Levenstein-Distant zum original
-        #   - Danach: Bester Score gewinnt
-        # - Beginne wieder von vorne für nächstes Wort
-
-        corrected_words = list()
-        for i in range(len(words)):
+        corrected_words = []
+        for i in enumerate(words):
             original_word = words[i]
 
             # Add line breaks to their original position
@@ -269,7 +288,7 @@ class TextCorrector(Module):
 
                     proportion = length  / org_length
                     if length > org_length:
-                        proportion = (org_length / length)
+                        proportion = org_length / length
 
                     # Short words
                     if org_length <= 5:
@@ -299,8 +318,8 @@ class TextCorrector(Module):
                 #], key=lambda x: x[0])
 
                 corrected_words.append(best)
-            except:
-                print("[TextCorrector] an Error occured during text reparation")
+            except Exception as e:
+                print("[TextCorrector] an Error occured during text reparation", e)
     
         if self.debug:
             debug_path = os.path.join(self.debug_folder, "debug_textcorrector.txt")

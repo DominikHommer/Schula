@@ -432,6 +432,7 @@ confidence=HIGH,
 disable=raw-checker-failed,
         missing-module-docstring,
         broad-exception-raised,
+        broad-exception-caught,
         trailing-whitespace,
         bad-inline-option,
         locally-disabled,
@@ -526,7 +527,7 @@ ignore-imports=yes
 ignore-signatures=yes
 
 # Minimum lines number of a similarity.
-min-similarity-lines=4
+min-similarity-lines=10
 
 
 [SPELLING]

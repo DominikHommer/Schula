@@ -1,7 +1,7 @@
 import os
 import cv2
-from .module_base import Module
 from ultralytics import YOLO
+from .module_base import Module
 
 class StrikeThroughCleaner(Module):
     """

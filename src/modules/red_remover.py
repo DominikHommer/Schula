@@ -46,4 +46,3 @@ class RedRemover(Module):
             print(f"[RedRemover] Debug-Bild gespeichert in: {debug_path}")
 
         return result
-

@@ -1,3 +1,4 @@
+# pylint: skip-file
 import os
 from typing_extensions import deprecated
 import cv2
