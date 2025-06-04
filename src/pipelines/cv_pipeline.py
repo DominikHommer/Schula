@@ -1,8 +1,8 @@
 import os
+import re
 import cv2
 import fleep
 from pdf2image import convert_from_path
-import re
 
 from .pipeline import Pipeline
 
@@ -11,7 +11,7 @@ class CVPipeline(Pipeline):
     Stellt eine modulare Pipeline zusammen, in der verschiedene Verarbeitungsschritte
     (Klassen mit einer process()-Methode) sequentiell ausgeführt werden.
     """
-    def __init__(self, input_data: dict = {}):
+    def __init__(self, input_data: dict | None = None):
         super().__init__(input_data)
 
     def _is_pdf(self, file_path) -> bool:
@@ -23,23 +23,26 @@ class CVPipeline(Pipeline):
         return False
     
     def run_and_save_text(self, paths: list[str], output_txt: str|None = None):
+        """
+        Runs pipeline and saves final text in output file
+        """
         path_inputs = []
-        for input in paths:
-            if self._is_pdf(input):
-                images = convert_from_path(input)
+        for _input in paths:
+            if self._is_pdf(_input):
+                images = convert_from_path(_input)
             
                 for i, img in enumerate(images):
                     path = os.path.join("data", "local", f"image_{i}.png")
                     img.save(path)
                     path_inputs.append(path)
             else:
-                path_inputs.append(input)
+                path_inputs.append(_input)
 
         ret = []
-        for input in path_inputs:
-            image = cv2.imread(input)
+        for _input in path_inputs:
+            image = cv2.imread(_input)
             if image is None:
-                raise ValueError(f"Bild konnte nicht geladen werden: {input}")
+                raise ValueError(f"Bild konnte nicht geladen werden: {_input}")
             
             data = self.run(image)
 

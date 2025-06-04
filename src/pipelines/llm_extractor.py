@@ -10,10 +10,13 @@ class LLMTextExtractorPipeline(LLMPipeline):
     TODO: -> Input sollte Schülertext, splitted Musterlösung enthalten
           -> Extraktion sollte async parallel bearbeitet werden
     """
-    def __init__(self, llmClient: LanguageClient, input_data: dict = {}):
+    def __init__(self, llmClient: LanguageClient, input_data: dict | None = None):
         super().__init__(llmClient, input_data)
 
-        self.add_stage(LLMExtraction(debug=True))
+        self.add_stage(LLMExtraction(debug=False))
 
     def process_streamlit(self):
+        """
+        Execute pipeline in streamlit context
+        """
         return self.run()

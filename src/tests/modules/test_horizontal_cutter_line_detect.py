@@ -1,3 +1,4 @@
+# pylint: skip-file
 import unittest
 import os
 import numpy as np

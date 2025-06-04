@@ -7,19 +7,30 @@ class Pipeline:
     Stellt eine modulare Pipeline zusammen, in der verschiedene Verarbeitungsschritte
     (Klassen mit einer process()-Methode) sequentiell ausgeführt werden.
     """
-    def __init__(self, input_data: dict = {}):
+    def __init__(self, input_data: dict | None = None):
         self.stages: list[Module] = []
-        self.data: dict = input_data
+        self.data: dict = {}
+        if input_data is not None:
+            self.data = input_data
     
     def add_stage(self, stage):
+        """
+        Add module to pipeline
+        """
         self.stages.append(stage)
     
     def _check_condition(self, module: Module):
+        """
+        Check if all precondition of current module in pipeline is fulfilled
+        """
         for condition in module.get_preconditions():
             if self.data.get(condition, None) is None:
                 raise Exception(f"Precondition of ${module.module_key} not fulfilled")
 
     def run(self, input_data = None):
+        """
+        Executes pipeline
+        """
         self.data['input'] = input_data
         for module in self.stages:
             self._check_condition(module)
