@@ -1,7 +1,6 @@
+import json
 import streamlit as st
 from pdf2image import convert_from_bytes
-import json
-
 from langchain_core.messages import AIMessage, HumanMessage
 
 from libs.language_client import LanguageClient
@@ -15,6 +14,9 @@ _studenExamProcessorPipeline = StudentExamProcessorPipeline()
 _pdfProcessorPipeline = PdfProcessorPipeline()
 
 def app_session_init():
+    """
+    Init app session states
+    """
     # Initialize session state keys if they don't exist
     if "chat_history" not in st.session_state:
         st.session_state["chat_history"] = [AIMessage(content="Hi, lade die Dateien hoch und ich kann dir weiterhelfen :)")]
@@ -43,12 +45,15 @@ def app_session_init():
                 with st.chat_message("ai"):
                     st.write(msg.content)
             elif isinstance(msg, HumanMessage):
-                 with st.chat_message("human"):
+                with st.chat_message("human"):
                     st.write(msg.content)
             # Do not display SystemMessage in the chat UI
 
 
 def run():
+    """
+    Run streamlit app
+    """
     st.set_page_config(page_title="Helferlein")
     st.header("Lehrer :blue[Helferlein]")
 
@@ -119,7 +124,7 @@ def run():
                 if isinstance(data, dict):
                     data = [data]
 
-                for block_idx, sheet in enumerate(data, 1):
+                for _, sheet in enumerate(data, 1):
                     st.write(f"**Titel:** {sheet.get('title', 'Kein Titel')}")
                     st.write(f"**Fach:** {sheet.get('subject', 'Unbekannt')}")
                     st.write(f"**Hinweise:** {sheet.get('instructions', '-')}")
@@ -151,7 +156,7 @@ def run():
                 if isinstance(data, dict):
                     data = [data]
 
-                for block_idx, block in enumerate(data, 1):
+                for _, block in enumerate(data, 1):
                     if block.get("assignment_title"):
                         st.write(f"**Titel:** {block['assignment_title']}")
                     if block.get("subject"):
