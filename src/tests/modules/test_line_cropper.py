@@ -9,7 +9,7 @@ TEST_INPUT_PATH = os.path.join("tests", "fixtures", "horizontal_cut_section.png"
 
 class TestLineCropper(unittest.TestCase):
     def setUp(self):
-        self.line_cropper = LineCropper(debug=True)
+        self.line_cropper = LineCropper(debug=False)
         if not os.path.exists(TEST_INPUT_PATH):
             self.skipTest(f"Testbild nicht gefunden: {TEST_INPUT_PATH}")
 
@@ -30,11 +30,9 @@ class TestLineCropper(unittest.TestCase):
             self.assertGreater(w, 0)
 
     def test_debug_images_created(self):
+        self.line_cropper = LineCropper(debug=True)
         image = cv2.imread(TEST_INPUT_PATH)
         self.line_cropper.process({"horizontal-cutter": [image]})
 
         debug_path = os.path.join(self.line_cropper.debug_folder, "debug_section_0.png")
         self.assertTrue(os.path.exists(debug_path))
-
-if __name__ == "__main__":
-    unittest.main()

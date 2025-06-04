@@ -27,7 +27,3 @@ Install in extra step (somehow it does not work in requirements file):
 - Tests should be in the folder `tests`
 - Mockup test data should be under `tests/fixtures`
 - A test is only complete if every aspect of a module / pipeline is tested!
-
-## UI Tests
-
-- TBD

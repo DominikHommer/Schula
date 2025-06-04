@@ -9,7 +9,7 @@ TEST_IMAGE_PATH = os.path.join("tests", "fixtures", "test_image_cut.png")
 
 class TestHorizontalCutterLineDetect(unittest.TestCase):
     def setUp(self):
-        self.module = HorizontalCutterLineDetect(debug=True)
+        self.module = HorizontalCutterLineDetect(debug=False)
         if not os.path.exists(TEST_IMAGE_PATH):
             self.skipTest(f"Testbild nicht gefunden: {TEST_IMAGE_PATH}")
     
@@ -21,6 +21,7 @@ class TestHorizontalCutterLineDetect(unittest.TestCase):
         
         self.assertIsInstance(result, list)
         self.assertGreater(len(result), 0)
+        self.assertEqual(len(result), 32)
 
         for section in result:
             self.assertIsInstance(section, np.ndarray)
@@ -29,6 +30,8 @@ class TestHorizontalCutterLineDetect(unittest.TestCase):
             self.assertEqual(image.shape[1], w)
 
     def test_debug_image_exists(self):
+        self.module = HorizontalCutterLineDetect(debug=True)
+        
         image = cv2.imread(TEST_IMAGE_PATH)
         self.module.process({"red-remover": image})
         debug_image_path = os.path.join(self.module.debug_folder, "debug_horizontalCutterLineDetect.png")

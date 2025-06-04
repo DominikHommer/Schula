@@ -1,11 +1,14 @@
 import unittest
-from src.modules.structured_document_parser import StructuredDocumentParser
+import sys
+
+sys.path.append('../../../models')
+
+from modules.structured_document_parser import StructuredDocumentParser
 from models.parser.assignment_sheet import AssignmentSheet
 from models.parser.model_solution import ModelSolution
 from models.parser.schulbuch_seite import SchulbuchSeite
 
 class TestStructuredDocumentParser(unittest.TestCase):
-
     def test_assignment_sheet_parsing(self):
         parser = StructuredDocumentParser(
             schema_model=AssignmentSheet,

@@ -9,7 +9,7 @@ TEST_IMAGE_PATH = os.path.join("tests", "fixtures", "line_crop_handwriting.png")
 
 class TestLinePrepareRecognizer(unittest.TestCase):
     def setUp(self):
-        self.module = LinePrepareRecognizer(debug=True)
+        self.module = LinePrepareRecognizer(debug=False)
         if not os.path.exists(TEST_IMAGE_PATH):
             self.skipTest(f"Testbild nicht gefunden: {TEST_IMAGE_PATH}")
 
@@ -29,6 +29,7 @@ class TestLinePrepareRecognizer(unittest.TestCase):
             self.assertEqual(processed.shape[2], 3)  # RGB
 
     def test_debug_output_created(self):
+        self.module = LinePrepareRecognizer(debug=True)
         image = cv2.imread(TEST_IMAGE_PATH)
         self.module.process({"line-cropper": [image]})
 
