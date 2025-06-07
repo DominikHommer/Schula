@@ -40,7 +40,9 @@ class TextCorrector(Module):
 
     def _warmup(self):
         spellchecker_words = []
-        with open('../models/symspell/de-100k_schulbuch.txt', "r", encoding="utf-8") as dic:
+        path = os.path.join("models", "symspell", "de-100k_schulbuch.txt")
+
+        with open(path, "r", encoding="utf-8") as dic:
             for line in dic:
                 parts = line.strip().split()
                 if len(parts) >= 2:

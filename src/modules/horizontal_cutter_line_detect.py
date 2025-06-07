@@ -115,11 +115,38 @@ class HorizontalCutterLineDetect(Module):
             if abs(angle) <= self.angle_tol or abs(abs(angle) - math.pi) <= self.angle_tol:
                 segments.append((x1, y1, x2, y2))
         
-        if not segments or len(segments) < 10:
+        if not segments or len(segments) < 20:
             print("[HorizontalCutterLineDetect] Keine oder zu wenige horizontalen Segmente gefunden.")
             return []
         
         return segments
+
+    def _rotate_image(self, gray) -> np.ndarray:
+        edges = cv2.Canny(gray, 50, 150, apertureSize=3)
+
+        lines = cv2.HoughLinesP(edges, rho=1, theta=np.pi/180, threshold=100,
+                                minLineLength=100, maxLineGap=10)
+
+        angles = []
+        for line in lines:
+            x1, y1, x2, y2 = line[0]
+            angle = np.degrees(np.arctan2(y2 - y1, x2 - x1))
+            angles.append(angle)
+
+        median_angle = np.median(angles)
+
+        (h, w) = gray.shape[:2]
+        center = (w // 2, h // 2)
+        M = cv2.getRotationMatrix2D(center, median_angle, 1.0)
+        rotated = cv2.warpAffine(gray, M, (w, h),
+                                flags=cv2.INTER_CUBIC,
+                                borderMode=cv2.BORDER_REPLICATE)
+        
+        if self.debug:
+            dbg_path = os.path.join(self.debug_folder, "debug_horizontalCutterLineDetect_rotated.jpg")
+            cv2.imwrite(dbg_path, rotated)
+
+        return rotated
 
     def process(self, data: dict) -> list:
         original: np.ndarray = data['red-remover']
@@ -130,6 +157,8 @@ class HorizontalCutterLineDetect(Module):
 
         gray = cv2.cvtColor(temp, cv2.COLOR_BGR2GRAY)
         gray = self._remove_gray(gray)
+
+        gray = self._rotate_image(gray)
 
         if self.blur_type == 'median':
             gray = cv2.medianBlur(gray, self.blur_ksize)
@@ -147,7 +176,7 @@ class HorizontalCutterLineDetect(Module):
         segments = self._get_segments(fld.detect(gray))
         if len(segments) == 0:
             return []
-
+        
         mid_ys = sorted((y1 + y2) / 2 for x1, y1, x2, y2 in segments)
         clusters = [[mid_ys[0]]]
         for y in mid_ys[1:]:

@@ -27,12 +27,12 @@ class CVPipeline(Pipeline):
         Runs pipeline and saves final text in output file
         """
         path_inputs = []
-        for _input in paths:
+        for p_i, _input in enumerate(paths):
             if self._is_pdf(_input):
                 images = convert_from_path(_input)
             
                 for i, img in enumerate(images):
-                    path = os.path.join("data", "local", f"image_{i}.png")
+                    path = os.path.join("data", "local", f"image_{p_i}_{i}.png")
                     img.save(path)
                     path_inputs.append(path)
             else:
