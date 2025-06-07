@@ -5,9 +5,10 @@ import base64
 from pathlib import Path
 from typing import Type
 from dotenv import load_dotenv
-from groq import Groq
 from pdf2image import convert_from_path
 from pydantic import BaseModel
+from langchain_ollama import ChatOllama
+from langchain_core.messages import SystemMessage, HumanMessage
 
 from .module_base import Module
 
@@ -18,13 +19,12 @@ class StructuredDocumentParser(Module):
     def __init__(self, schema_model: Type[BaseModel], prompt: str, debug=False, debug_output="output.txt"):
         super().__init__("structured-document-parser")
         load_dotenv()
-        self.api_key = os.getenv("GROQ_API_KEY")
-        self.client = Groq(api_key=self.api_key)
         self.schema_model = schema_model
-        self.schema_json = schema_model.model_json_schema()
         self.prompt_text = prompt
+        self.schema_json = schema_model.model_json_schema()
         self.debug = debug
         self.output_path = debug_output
+        self.llm = ChatOllama(model="gemma3:27b", temperature=1.0).with_structured_output(schema_model)
 
     def process(self, data: dict) -> list[BaseModel]:
         pdf_path: str = data.get("pdf-path")
@@ -35,8 +35,7 @@ class StructuredDocumentParser(Module):
         results = []
 
         if self.debug:
-            with open(self.output_path, "w", encoding="utf-8") as file:
-                f_out = file
+            f_out = open(self.output_path, "w", encoding="utf-8")
 
         for i, page in enumerate(pages):
             print(f"[Parser] Verarbeite Seite {i+1}...")
@@ -47,32 +46,20 @@ class StructuredDocumentParser(Module):
                 b64 = base64.b64encode(img_file.read()).decode("utf-8")
             image_data_url = f"data:image/jpeg;base64,{b64}"
 
+            content_parts = [
+                {"type": "text", "text": "Bitte extrahiere strukturierte Informationen im angegebenen Format."},
+                {"type": "image_url", "image_url": image_data_url},
+            ]
+
             messages = [
-                {"role": "system", "content": self._build_prompt()},
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": "Bitte extrahiere strukturierte Informationen im angegebenen Format."},
-                        {"type": "image_url", "image_url": {"url": image_data_url}}
-                    ]
-                }
+                SystemMessage(content=self._build_prompt()),
+                HumanMessage(content=content_parts)
             ]
 
             parsed = None
             for attempt in range(1, 6):
                 try:
-                    completion = self.client.chat.completions.create(
-                        model="meta-llama/llama-4-scout-17b-16e-instruct",
-                        messages=messages,
-                        temperature=0.3,
-                        max_completion_tokens=3000,
-                        top_p=1,
-                        stream=False,
-                        response_format={"type": "json_object"},
-                    )
-                    raw = completion.choices[0].message.content
-                    parsed_data = json.loads(raw) if isinstance(raw, str) else raw
-                    parsed = self.schema_model(**parsed_data)
+                    parsed = self.llm.invoke(messages)
                     break
                 except Exception as e:
                     print(f"[Parser] Fehler bei Seite {i+1} (Versuch {attempt}): {e}")
@@ -89,6 +76,7 @@ class StructuredDocumentParser(Module):
 
         if self.debug:
             f_out.close()
+
         return results
 
     def _build_prompt(self) -> str:
