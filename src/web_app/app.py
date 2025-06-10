@@ -9,6 +9,7 @@ from pipelines.pdf_processor import PdfProcessorPipeline
 from pipelines.llm_extractor import LLMTextExtractorPipeline
 from pipelines.student_exam_extractor import StudentExamProcessorPipeline
 
+CV_PIPELINE=False
 llmClient = LanguageClient()
 _studenExamProcessorPipeline = StudentExamProcessorPipeline()
 _pdfProcessorPipeline = PdfProcessorPipeline()
@@ -90,8 +91,14 @@ def run():
             st.rerun()
 
     # --- Process Student File (only if changed and not processed) ---
+    ###
+    # TODO: Enable both jpg and pdf uploads, since pdf's get converted to jpg anyway
+    ###
     if uploaded_student_file is not None:
-        _studenExamProcessorPipeline.process_streamlit(uploaded_student_file, "student")
+        if CV_PIPELINE :
+            _studenExamProcessorPipeline.process_streamlit(uploaded_student_file, "student")
+        else:
+            _pdfProcessorPipeline.process_streamlit(uploaded_student_file, "student")
 
     # --- Process Task File (only if changed and not processed) ---
     if uploaded_task_file is not None:
@@ -105,9 +112,44 @@ def run():
     st.subheader("Verarbeitete Dokumente")
     col1, col2, col3 = st.columns(3)
     with col1:
-        if st.session_state.student_file_processed:
-            #st.image(uploaded_student_file, caption="Klausur-Scan", use_container_width=True)
-            st.text_area("Extrahierter Klausurtext", st.session_state.student_text, height=150, key="student_text_area")
+        if st.session_state.solution_file_processed:
+            # Erste Seite als Vorschau anzeigen
+            try:
+                images = convert_from_bytes(uploaded_solution_file.read(), first_page=1, last_page=1)
+                st.image(images[0], caption="Klausur", use_container_width=True)
+            except Exception as e:
+                st.warning(f"Fehler beim Anzeigen der Vorschau: {e}")
+
+            # Strukturierte Darstellung der Musterlösung
+            try:
+                data = json.loads(st.session_state.student_text)
+                if isinstance(data, dict):
+                    data = [data]
+
+                for _, block in enumerate(data, 1):
+                    if block.get("assignment_title"):
+                        st.write(f"**Titel:** {block['assignment_title']}")
+                    if block.get("subject"):
+                        st.write(f"**Fach:** {block['subject']}")
+
+                    if block.get("solutions"):
+                        for idx, solution in enumerate(block["solutions"], 1):
+                            st.markdown(f"#### Aufgabe {solution.get('number', idx)}")
+                            if solution.get("title"):
+                                st.write(f"**Thema:** {solution['title']}")
+                            if solution.get("solution_text"):
+                                st.write(solution["solution_text"])
+                            for sub in solution.get("subsolutions", []):
+                                label = sub.get("label")
+                                content = sub.get("solution", "")
+                                if label:
+                                    st.write(f"- **{label}** {content}")
+                                else:
+                                    st.write(f"- {content}")
+            except Exception as e:
+                st.warning(f"Fehler beim Anzeigen der Lösung: {e}")
+                st.text_area("Extrahierter Klausurtext (roh)", st.session_state.student_text, height=150, key="student_text_area")
+
         else:
             st.info("Bitte Klausur-Scan hochladen.")
 
@@ -138,7 +180,7 @@ def run():
                 st.text_area("Extrahierter Aufgabentext (roh)", st.session_state.task_text, height=150, key="task_text_area")
 
         else:
-            st.info("Bitte Aufgabenstellung hochladen.")
+            st.info("Bitte Aufgabenstellung hochladen. (Optional)")
 
 
     with col3:
@@ -186,28 +228,28 @@ def run():
 
     st.divider() # Separator before chat
 
-    # --- Chat Interface ---
-    st.subheader("Chat")
-
-    # Display chat history (app_session_init handles this now, called at the start)
-
-    # Get user input
-    prompt = st.chat_input("Schreibe eine Nachricht...")
 
     # Handle chat logic
-    if prompt:
-        extractor = LLMTextExtractorPipeline(llmClient)
-        a = extractor.process_streamlit()
-        
-        print(a)
+    with st.container():
+        if st.button(label="Magic", icon=":material/wand_stars:", use_container_width=True) and (st.session_state["student_file_processed"] and st.session_state["solution_file_processed"]):
 
-        ## TODO HERE: Define process together in group, since we don't want a chat anymore and the things should happen on button interaction
-        #
-        ## Check if both files have been processed before allowing chat queries
-        #if st.session_state.student_file_processed and st.session_state.task_file_processed and st.session_state.solution_file_processed:
-        #     # Pass the processed text from session state
-        #    llm_client.get_response(prompt, st.session_state.student_text, st.session_state.teacher_text) # TODO: Adjust for new files
-        #    # After get_response updates session_state['chat_history'], rerun to display the new messages
-        #    st.rerun()
-        #else:
-        #    st.warning("Bitte laden Sie zuerst alle Dateien (Klausur, Aufgabenstelle, Musterlösung) hoch und warten Sie, bis sie verarbeitet wurden.")
+            responses = LLMTextExtractorPipeline(llmClient)
+
+            with st.chat_message("ai"):
+
+                markdown_parts = []
+                for task_id, response_data in sorted(responses.items(), key=lambda item: int(item[0])):
+                    # Add a header and a horizontal rule for clear separation
+                    markdown_parts.append(f"--- \n ### 📝 Aufgabe {task_id}")
+
+                    if isinstance(response_data, dict):
+                        for key, value in response_data.items():
+                            # Format the key nicely (e.g., 'feedback' -> 'Feedback') and make it bold
+                            formatted_key = key.replace("_", " ").capitalize()
+                            markdown_parts.append(f"**{formatted_key}:** {value}")
+                    else:
+                        # Fallback if a response is just a simple string
+                        markdown_parts.append(str(response_data))
+
+                full_markdown = "\n\n".join(markdown_parts)
+                st.markdown(full_markdown)

@@ -19,12 +19,16 @@ class StructuredDocumentParser(Module):
     def __init__(self, schema_model: Type[BaseModel], prompt: str, debug=False, debug_output="output.txt"):
         super().__init__("structured-document-parser")
         load_dotenv()
+        ### Groq ###
+        # self.api_key = os.getenv("GROQ_API_KEY")Add commentMore actions
+        # self.client = Groq(api_key=self.api_key)
         self.schema_model = schema_model
         self.prompt_text = prompt
         self.schema_json = schema_model.model_json_schema()
         self.debug = debug
         self.output_path = debug_output
-        self.llm = ChatOllama(model="gemma3:27b", temperature=1.0).with_structured_output(schema_model)
+        ### Gemma ##
+        self.llm = ChatOllama(model="gemma3:27b", temperature=0.2).with_structured_output(schema_model)
 
     def process(self, data: dict) -> list[BaseModel]:
         pdf_path: str = data.get("pdf-path")
@@ -45,7 +49,19 @@ class StructuredDocumentParser(Module):
             with open(image_path, "rb") as img_file:
                 b64 = base64.b64encode(img_file.read()).decode("utf-8")
             image_data_url = f"data:image/jpeg;base64,{b64}"
+            ### Groq ###
+            # messages = [Add commentMore actions
+            #     {"role": "system", "content": self._build_prompt()},
+            #     {
+            #         "role": "user",
+            #         "content": [
+            #             {"type": "text", "text": "Bitte extrahiere strukturierte Informationen im angegebenen Format."},
+            #             {"type": "image_url", "image_url": {"url": image_data_url}}
+            #         ]
+            #     }
+            # ]
 
+            ### Gemma ###
             content_parts = [
                 {"type": "text", "text": "Bitte extrahiere strukturierte Informationen im angegebenen Format."},
                 {"type": "image_url", "image_url": image_data_url},
@@ -59,6 +75,21 @@ class StructuredDocumentParser(Module):
             parsed = None
             for attempt in range(1, 6):
                 try:
+                    ### Groq ###
+                    # completion = self.client.chat.completions.create(Add commentMore actions
+                    #     model="meta-llama/llama-4-scout-17b-16e-instruct",
+                    #     messages=messages,
+                    #     temperature=0.3,
+                    #     max_completion_tokens=3000,
+                    #     top_p=1,
+                    #     stream=False,
+                    #     response_format={"type": "json_object"},
+                    # )
+                    # raw = completion.choices[0].message.content
+                    # parsed_data = json.loads(raw) if isinstance(raw, str) else raw
+                    # parsed = self.schema_model(**parsed_data)
+
+                    ### Gemma ###
                     parsed = self.llm.invoke(messages)
                     break
                 except Exception as e:

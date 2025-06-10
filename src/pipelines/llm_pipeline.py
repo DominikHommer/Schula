@@ -15,7 +15,7 @@ class LLMPipeline(Pipeline):
         for module in self.stages:
             super()._check_condition(module)
 
-            self.data[module.module_key] = module.process(self.data, self.llm_client)
+            self.data[module.module_key] = module.process(self.data['input'], self.llm_client)
 
         # Output is result of last stage
         return self.data[self.stages[-1].module_key]
