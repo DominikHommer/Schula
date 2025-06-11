@@ -11,7 +11,7 @@ class LanguageClient():
     model: BaseChatModel
     
     # model = cached_initialize_model()
-    def __init__(self, model: str="deepseek-r1:70b"):
+    def __init__(self, model: str="gemma3:27b"):
         self.model = ChatOllama(model=model)
 
     def use_structured_output(self, json_schema: dict):

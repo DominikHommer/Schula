@@ -21,7 +21,7 @@ def app_session_init():
     Init app session states
     """
 
-    files = ["student", "task", "solution"]
+    files = ["student", "task", "solution", "extraction"]
     st.session_state.setdefault('step', 1)
 
     for file in files:
@@ -104,6 +104,7 @@ def run():
             uploaded_student_files = st.session_state.student_files
             try:
                 _pdfProcessorPipeline.process_streamlit(uploaded_student_files, "student")
+                #_studenExamProcessorPipeline.process_streamlit(uploaded_solution_files, "student")
                 st.session_state.step = 3
                 st.rerun()
             except Exception as e:
@@ -111,7 +112,7 @@ def run():
         show_progress()
 
     # Schritt 3: Vorschau & Extraktion
-    else:
+    elif st.session_state.step == 3:
         st.subheader("Schritt 3: Vorschau & Extraktion")
         cols = st.columns(2)
         # Vorschau Musterlösung
@@ -178,16 +179,39 @@ def run():
                 st.text_area("Extrahierter Klausurtext (roh)", st.session_state.student_text, height=150, key="student_text_area")
 
         if st.button("Extrahieren"):
-            responses = llm_extractor.extract_all()
-            st.markdown("---")
-            for task_id, data in sorted(responses.items(), key=lambda x: int(x[0])):
-                st.markdown(f"### 📝 Aufgabe {task_id}")
-                if isinstance(data, dict):
-                    for k, v in data.items():
-                        st.markdown(f"**{k.replace('_', ' ').capitalize()}:** {v}")
-                else:
-                    st.write(data)
-        show_progress()
+            responses = LLMTextExtractorPipeline(llmClient).process_solutions(st.session_state.solution_results[0], st.session_state.student_results[0])
+            st.session_state.extraction_started = True
+            st.session_state.extraction_text = responses
+            st.session_state.step = 4
+            st.rerun()
+            
+    elif st.session_state.step == 4:
+        st.subheader("Auswertung der Schülerantworten")
+        st.markdown("---")
+
+        try:
+            responses: dict = st.session_state.extraction_text
+
+            if not isinstance(responses, dict):
+                st.warning("Die Antwort ist kein Dictionary.")
+            else:
+                for key in sorted(responses.keys(), key=lambda x: int(x)):
+                    msg = responses[key]
+                    if isinstance(msg, AIMessage):
+                        st.markdown(f"### Aufgabe {key}")
+                        st.markdown(msg.content)
+                        st.markdown("---")
+                    else:
+                        st.write(f"Aufgabe {key}: Kein AIMessage-Objekt gefunden.")
+                        
+        except Exception as e:
+            st.error(f"Fehler beim Anzeigen der Extraktion: {e}")
+
+            
+    else:
+        st.subheader("Ungültiger Step")
+
+
 
 
 

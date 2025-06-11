@@ -33,7 +33,7 @@ class PdfProcessorPipeline(LLMPipeline):
 
         if not st.session_state.get(attribute_processed, False):
             with st.spinner("Verarbeite PDF..."):
-                progress_bar = st.progress(0.0)  # <–– Fortschrittsbalken definieren
+                progress_bar = st.progress(0.0)
                 status = st.empty()
 
                 def update_progress(current_page: int, total_pages: int):
