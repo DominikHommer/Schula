@@ -1,0 +1,53 @@
+
+
+=== Seite 1 ===
+
+{
+  "assignment_title": null,
+  "subject": "Psychologie",
+  "solutions": [
+    {
+      "number": 1,
+      "title": null,
+      "solution_text": "In dem Fallbeispiel geht es um Tim, der ein Identitätsproblem hat. Mit Identität meint man alle Erfahrungen und Meinungen, die man über Leben erlangt hat. Zusammen ergeben sie Persönlichkeit. Darunter fallen Merkmale wie das Geschlecht, Haarfarbe, Hobbys etc. Schwierigkeiten die Identität zu finden.",
+      "subsolutions": []
+    },
+    {
+      "number": 2,
+      "title": null,
+      "solution_text": "Es gibt bestimmte Kriterien, die die Identität beinhalten. Fragen wie: \"Wer bin ich?\", \"Was gebe ich vor zu sein?\", \"Wer sollte ich sein?\" gehören dazu.",
+      "subsolutions": []
+    },
+    {
+      "number": 3,
+      "title": null,
+      "solution_text": "Tim hat eine Leidenschaft für Kunst und Design.",
+      "subsolutions": []
+    },
+    {
+      "number": 4,
+      "title": null,
+      "solution_text": "Marcia hat ebenfalls ein Identitätsmodell erstellt. Dort zeigt er vier Identitätstypen auf: Erarbeitete Identität, übernommene Identität, kritische Identität und diffuse Identität.",
+      "subsolutions": []
+    },
+    {
+      "number": 5,
+      "title": null,
+      "solution_text": "Bei Tim liegt eine diffuse Identität vor.",
+      "subsolutions": []
+    },
+    {
+      "number": 6,
+      "title": null,
+      "solution_text": "Eine diffuse Identität meint das unsichere Verhalten einer Person. Der Bezug zu Bezugspersonen ist eher negativ und schwankend.",
+      "subsolutions": []
+    },
+    {
+      "number": 7,
+      "title": null,
+      "solution_text": "Eltern für Tim sind eher negative Bezugspersonen seine Eltern, die einen starken Einfluss haben, oder sie fest dazu, dass er sich nicht traut, einen \"sicheren\" Weg zu gehen. Er wird \"verloren\" und \"verzweifelt\" sein. Er hat keine Zukunft.",
+      "subsolutions": []
+    }
+  ],
+  "raw_text": null
+}

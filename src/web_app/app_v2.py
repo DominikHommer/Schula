@@ -80,11 +80,6 @@ def run():
                 st.rerun()
             except Exception as e:
                 st.warning(f"Fehler bei convert_from_bytes : {e}")
-            '''            
-            if uploaded_solution_file and not st.session_state.solution_file_processed:
-        # --- Process Solution File (only if changed and not processed) ---
-            _pdfProcessorPipeline.process_streamlit(uploaded_solution_file, "solution")
-            '''
         show_progress()
 
     # Schritt 2: Schulaufgabe hochladen
@@ -113,11 +108,6 @@ def run():
                 st.rerun()
             except Exception as e:
                 st.warning(f"Fehler bei convert_from_bytes : {e}")
-            '''            
-            if uploaded_solution_file and not st.session_state.solution_file_processed:
-        # --- Process Solution File (only if changed and not processed) ---
-            _pdfProcessorPipeline.process_streamlit(uploaded_solution_file, "solution")
-            '''
         show_progress()
 
     # Schritt 3: Vorschau & Extraktion
