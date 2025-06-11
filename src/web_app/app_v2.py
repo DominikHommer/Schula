@@ -20,6 +20,7 @@ def app_session_init():
     """
     Init app session states
     """
+
     files = ["student", "task", "solution"]
     for f in files:
         st.session_state.setdefault(f + "_started", False)
@@ -31,11 +32,9 @@ def app_session_init():
         if file+"_file_processed" not in st.session_state:
             st.session_state[file+"_file_processed"] = False
 
-    for file in files:
         if file+"_text" not in st.session_state:
             st.session_state[file+"_text"] = ""
-    
-    for file in files:
+
         if file+"_file_id" not in st.session_state:
             st.session_state[file+"_file_id"] = None # To track if the file changed
 
@@ -46,6 +45,9 @@ def show_progress():
         unsafe_allow_html=True,
     )
 
+def _set_file_started(type: str):
+    st.session_state[type + '_started'] = True
+    st.rerun()
 
 def run():
     st.set_page_config(page_title="Helferlein", layout="centered")
@@ -55,15 +57,25 @@ def run():
     st.markdown("<h1 style='text-align:center;'>Helferlein</h1>", unsafe_allow_html=True)
     st.divider()
 
+    _allowed_types = ["pdf", "jpg", "jpeg", "png"]
     # Schritt 1: Musterlösung hochladen
     if st.session_state.step == 1:
         st.subheader("Schritt 1: Musterlösung hochladen")
+        print(st.session_state.solution_started)
         if not st.session_state.solution_started:
+            #uploaded_solution_files = st.file_uploader(
+            #    "Musterlösung hochladen",
+            #    type = _allowed_types,
+            #    key = "solution_uploaders",
+            #    accept_multiple_files = True,
+            #)
+
+            st.button("Verarbeiten", type="primary", on_click = lambda: _set_file_started('solution'))
+            
             uploaded_solution_file = st.file_uploader("Musterlösung (PDF) hochladen", type=["pdf"], key="solution_uploader")
             if uploaded_solution_file:
-                st.session_state.solution_started = True
                 st.session_state.solution_file = uploaded_solution_file
-                st.rerun()
+                
         else:
             uploaded_solution_file = st.session_state.solution_file
             try:
