@@ -31,6 +31,13 @@ class PdfProcessorPipeline(LLMPipeline):
 
         if not st.session_state.get(attribute_processed, False):
             with st.spinner("Verarbeite PDF..."):
+                progress_bar = st.progress(0.0)  # <–– Fortschrittsbalken definieren
+                status = st.empty()
+
+                def update_progress(current_page: int, total_pages: int):
+                    progress_bar.progress(current_page / total_pages)
+                    status.text(f"Verarbeite Seite {current_page} von {total_pages}")
+
                 path = save_temp_file(uploaded_file, prefix=file_type)
                 if path:
                     if file_type == "task": # Aufgabenstellung
@@ -52,7 +59,7 @@ class PdfProcessorPipeline(LLMPipeline):
                         st.error("Unkown Use Case")
                         return
                     
-                    parser = StructuredDocumentParser(schema_model=schema, prompt=prompt, debug=True, debug_output=f"debug_output_{file_type}.txt") # currently no stage added in constructor!
+                    parser = StructuredDocumentParser(schema_model=schema, prompt=prompt, debug=True, debug_output=f"debug_output_{file_type}.txt", callback = update_progress) # currently no stage added in constructor!
 
                     try:
                         results = parser.process({"pdf-path": path})

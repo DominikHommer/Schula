@@ -16,7 +16,7 @@ class StructuredDocumentParser(Module):
     """
     Parses a document pdf into a structured json output
     """
-    def __init__(self, schema_model: Type[BaseModel], prompt: str, debug=False, debug_output="output.txt"):
+    def __init__(self, schema_model: Type[BaseModel], prompt: str, debug=False, debug_output="output.txt", callback= None):
         super().__init__("structured-document-parser")
         load_dotenv()
         ### Groq ###
@@ -29,6 +29,7 @@ class StructuredDocumentParser(Module):
         self.output_path = debug_output
         ### Gemma ##
         self.llm = ChatOllama(model="gemma3:27b", temperature=0.2).with_structured_output(schema_model)
+        self.callback = callback
 
     def process(self, data: dict) -> list[BaseModel]:
         pdf_path: str = data.get("pdf-path")
@@ -43,6 +44,8 @@ class StructuredDocumentParser(Module):
 
         for i, page in enumerate(pages):
             print(f"[Parser] Verarbeite Seite {i+1}...")
+            if self.callback:
+                self.callback(i + 1, len(pages)) 
             image_path = f"temp_page_{i+1:02d}.jpg"
             page.save(image_path, "JPEG")
 
