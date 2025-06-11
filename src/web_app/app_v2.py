@@ -22,13 +22,11 @@ def app_session_init():
     """
 
     files = ["student", "task", "solution"]
-    for f in files:
-        st.session_state.setdefault(f + "_started", False)
-        
-    if "step" not in st.session_state:
-        st.session_state.step = 1
+    st.session_state.setdefault('step', 1)
 
     for file in files:
+        st.session_state.setdefault(file + "_started", False)
+
         if file+"_file_processed" not in st.session_state:
             st.session_state[file+"_file_processed"] = False
 
@@ -45,10 +43,6 @@ def show_progress():
         unsafe_allow_html=True,
     )
 
-def _set_file_started(type: str):
-    st.session_state[type + '_started'] = True
-    st.rerun()
-
 def run():
     st.set_page_config(page_title="Helferlein", layout="centered")
     app_session_init()
@@ -56,6 +50,10 @@ def run():
     # Persistenter Header
     st.markdown("<h1 style='text-align:center;'>Helferlein</h1>", unsafe_allow_html=True)
     st.divider()
+
+    def _set_file_started(type: str):
+        st.session_state[type + '_started'] = True
+        st.rerun()
 
     _allowed_types = ["pdf", "jpg", "jpeg", "png"]
     # Schritt 1: Musterlösung hochladen
@@ -78,6 +76,8 @@ def run():
             try:
                 _pdfProcessorPipeline.process_streamlit(uploaded_solution_files, "solution")
                 st.session_state.step = 2
+
+                st.rerun()
             except Exception as e:
                 st.warning(f"Fehler bei convert_from_bytes : {e}")
             '''            
@@ -90,17 +90,27 @@ def run():
     # Schritt 2: Schulaufgabe hochladen
     elif st.session_state.step == 2:
         st.subheader("Schritt 2: Schulaufgabe hochladen")
-        if not st.session_state.solution_started:
-            uploaded_student_file = st.file_uploader("Schulaufgabe (PDF) hochladen", type=["pdf"], key="student_uploader")
-            if uploaded_student_file:
-                st.session_state.student_started = True
-                st.session_state.student_file = uploaded_student_file
-                st.rerun()
+        if not st.session_state.student_started:
+            uploaded_student_files = st.file_uploader(
+                "Klausur-Scan hochladen",
+                type = _allowed_types,
+                key = "student_uploader",
+                accept_multiple_files = True,
+                help = "Es kann nur eine Schulaufgabe aufeinmal verarbeitet werden",
+            )
+
+            st.button("Verarbeiten", type="primary", on_click = lambda: _set_file_started('student'))
+                
+            if uploaded_student_files:
+                st.session_state.student_files = uploaded_student_files
+
         else:
-            uploaded_student_file = st.session_state.student_file
+            uploaded_student_files = st.session_state.student_files
             try:
-                _pdfProcessorPipeline.process_streamlit(uploaded_student_file, "student")
-                #st.session_state.step = 2
+                _pdfProcessorPipeline.process_streamlit(uploaded_student_files, "student")
+                st.session_state.step = 3
+
+                st.rerun()
             except Exception as e:
                 st.warning(f"Fehler bei convert_from_bytes : {e}")
             '''            

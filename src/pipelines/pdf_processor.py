@@ -77,5 +77,3 @@ class PdfProcessorPipeline(LLMPipeline):
                             os.remove(path)
                     except OSError as e:
                         st.warning(f"Konnte temporäre Datei nicht löschen, Fehler: {e}")
-
-            st.rerun()
