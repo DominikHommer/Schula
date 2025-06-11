@@ -1,5 +1,30 @@
 import tempfile
 import os
+import fleep
+from pdf2image import convert_from_path
+
+def is_pdf(file_path) -> bool:
+    with open(file_path, "rb") as file:
+        info = fleep.get(file.read(128))
+
+        return info.extension_matches("pdf")
+    
+    return False
+
+def normalize_paths(paths):
+    path_inputs = []
+    for p_i, _input in enumerate(paths):
+        if is_pdf(_input):
+            images = convert_from_path(_input)
+        
+            for i, img in enumerate(images):
+                path = os.path.join("data", "local", f"image_{p_i}_{i}.png")
+                img.save(path)
+                path_inputs.append(path)
+        else:
+            path_inputs.append(_input)
+
+    return path_inputs
 
 def save_temp_file(uploaded_file, prefix: str ="student") -> str | None:
     """

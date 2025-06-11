@@ -61,25 +61,22 @@ def run():
     # Schritt 1: Musterlösung hochladen
     if st.session_state.step == 1:
         st.subheader("Schritt 1: Musterlösung hochladen")
-        print(st.session_state.solution_started)
         if not st.session_state.solution_started:
-            #uploaded_solution_files = st.file_uploader(
-            #    "Musterlösung hochladen",
-            #    type = _allowed_types,
-            #    key = "solution_uploaders",
-            #    accept_multiple_files = True,
-            #)
+            uploaded_solution_files = st.file_uploader(
+                "Musterlösung hochladen",
+                type = _allowed_types,
+                key = "solution_uploader",
+                accept_multiple_files = True,
+            )
 
             st.button("Verarbeiten", type="primary", on_click = lambda: _set_file_started('solution'))
-            
-            uploaded_solution_file = st.file_uploader("Musterlösung (PDF) hochladen", type=["pdf"], key="solution_uploader")
-            if uploaded_solution_file:
-                st.session_state.solution_file = uploaded_solution_file
+            if uploaded_solution_files:
+                st.session_state.solution_files = uploaded_solution_files
                 
         else:
-            uploaded_solution_file = st.session_state.solution_file
+            uploaded_solution_files = st.session_state.solution_files
             try:
-                _pdfProcessorPipeline.process_streamlit(uploaded_solution_file, "solution")
+                _pdfProcessorPipeline.process_streamlit(uploaded_solution_files, "solution")
                 st.session_state.step = 2
             except Exception as e:
                 st.warning(f"Fehler bei convert_from_bytes : {e}")

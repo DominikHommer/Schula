@@ -32,26 +32,21 @@ class StructuredDocumentParser(Module):
         self.callback = callback
 
     def process(self, data: dict) -> list[BaseModel]:
-        pdf_path: str = data.get("pdf-path")
-        if not pdf_path or not Path(pdf_path).exists():
-            raise FileNotFoundError(f"PDF nicht gefunden: {pdf_path}")
-
-        pages = convert_from_path(pdf_path, dpi=300)
+        paths: str = data.get("paths")
         results = []
 
         if self.debug:
             f_out = open(self.output_path, "w", encoding="utf-8")
 
-        for i, page in enumerate(pages):
-            print(f"[Parser] Verarbeite Seite {i+1}...")
+        for i, path in enumerate(paths):
             if self.callback:
-                self.callback(i + 1, len(pages)) 
-            image_path = f"temp_page_{i+1:02d}.jpg"
-            page.save(image_path, "JPEG")
-
-            with open(image_path, "rb") as img_file:
+                self.callback(i + 1, len(paths))
+            print(f"[Parser] Verarbeite Seite {i+1}...")
+            
+            with open(path, "rb") as img_file:
                 b64 = base64.b64encode(img_file.read()).decode("utf-8")
-            image_data_url = f"data:image/jpeg;base64,{b64}"
+            
+            image_data_url = f"data:image/png;base64,{b64}"
             ### Groq ###
             # messages = [Add commentMore actions
             #     {"role": "system", "content": self._build_prompt()},
@@ -105,8 +100,6 @@ class StructuredDocumentParser(Module):
                 if self.debug:
                     f_out.write(f"\n\n=== Seite {i+1} ===\n\n")
                     f_out.write(json.dumps(parsed.model_dump(), indent=2, ensure_ascii=False))
-
-            os.remove(image_path)
 
         if self.debug:
             f_out.close()
