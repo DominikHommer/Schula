@@ -53,7 +53,6 @@ def run():
 
     def _set_file_started(type: str):
         st.session_state[type + '_started'] = True
-        st.rerun()
 
     _allowed_types = ["pdf", "jpg", "jpeg", "png"]
     # Schritt 1: Musterlösung hochladen
@@ -67,11 +66,13 @@ def run():
                 accept_multiple_files = True,
             )
 
-            st.button("Verarbeiten", type="primary", on_click = lambda: _set_file_started('solution'))
+            if st.button("Verarbeiten", type="primary", on_click = lambda: _set_file_started('solution')):
+                st.rerun()
             if uploaded_solution_files:
                 st.session_state.solution_files = uploaded_solution_files
                 
         else:
+            
             uploaded_solution_files = st.session_state.solution_files
             try:
                 _pdfProcessorPipeline.process_streamlit(uploaded_solution_files, "solution")
@@ -104,7 +105,6 @@ def run():
             try:
                 _pdfProcessorPipeline.process_streamlit(uploaded_student_files, "student")
                 st.session_state.step = 3
-
                 st.rerun()
             except Exception as e:
                 st.warning(f"Fehler bei convert_from_bytes : {e}")
@@ -118,18 +118,64 @@ def run():
         with cols[0]:
             st.markdown("**Musterlösung**")
             try:
-                img = convert_from_bytes(st.session_state.solution_file.read(), first_page=1, last_page=1)[0]
-                st.image(img, use_container_width=True)
-            except:
-                st.info("Keine Vorschau verfügbar.")
+                data = json.loads(st.session_state.solution_text)
+                if isinstance(data, dict):
+                    data = [data]
+
+                for _, block in enumerate(data, 1):
+                    if block.get("assignment_title"):
+                        st.write(f"**Titel:** {block['assignment_title']}")
+                    if block.get("subject"):
+                        st.write(f"**Fach:** {block['subject']}")
+
+                    if block.get("solutions"):
+                        for idx, solution in enumerate(block["solutions"], 1):
+                            st.markdown(f"#### Aufgabe {solution.get('number', idx)}")
+                            if solution.get("title"):
+                                st.write(f"**Thema:** {solution['title']}")
+                            if solution.get("solution_text"):
+                                st.write(solution["solution_text"])
+                            for sub in solution.get("subsolutions", []):
+                                label = sub.get("label")
+                                content = sub.get("solution", "")
+                                if label:
+                                    st.write(f"- **{label}** {content}")
+                                else:
+                                    st.write(f"- {content}")
+            except Exception as e:
+                st.warning(f"Fehler beim Anzeigen der Lösung: {e}")
+                st.text_area("Extrahierter Lösungstext (roh)", st.session_state.solution_text, height=150, key="teacher_solution_area")
         # Vorschau Schulaufgabe
         with cols[1]:
             st.markdown("**Schulaufgabe**")
             try:
-                img = convert_from_bytes(st.session_state.student_file.read(), first_page=1, last_page=1)[0]
-                st.image(img, use_container_width=True)
-            except:
-                st.info("Keine Vorschau verfügbar.")
+                data = json.loads(st.session_state.student_text)
+                if isinstance(data, dict):
+                    data = [data]
+
+                for _, block in enumerate(data, 1):
+                    if block.get("assignment_title"):
+                        st.write(f"**Titel:** {block['assignment_title']}")
+                    if block.get("subject"):
+                        st.write(f"**Fach:** {block['subject']}")
+
+                    if block.get("solutions"):
+                        for idx, solution in enumerate(block["solutions"], 1):
+                            st.markdown(f"#### Aufgabe {solution.get('number', idx)}")
+                            if solution.get("title"):
+                                st.write(f"**Thema:** {solution['title']}")
+                            if solution.get("solution_text"):
+                                st.write(solution["solution_text"])
+                            for sub in solution.get("subsolutions", []):
+                                label = sub.get("label")
+                                content = sub.get("solution", "")
+                                if label:
+                                    st.write(f"- **{label}** {content}")
+                                else:
+                                    st.write(f"- {content}")
+            except Exception as e:
+                st.warning(f"Fehler beim Anzeigen der Lösung: {e}")
+                st.text_area("Extrahierter Klausurtext (roh)", st.session_state.student_text, height=150, key="student_text_area")
 
         if st.button("Extrahieren"):
             responses = llm_extractor.extract_all()
