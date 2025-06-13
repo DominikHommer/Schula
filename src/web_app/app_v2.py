@@ -66,7 +66,8 @@ def run():
                 accept_multiple_files = True,
             )
 
-            if st.button("Verarbeiten", type="primary", on_click = lambda: _set_file_started('solution')):
+            # when no files have been uploaded, the button is disabled
+            if st.button("Verarbeiten", type="primary", on_click = lambda: _set_file_started('solution'), disabled=not uploaded_solution_files):
                 st.rerun()
             if uploaded_solution_files:
                 st.session_state.solution_files = uploaded_solution_files
@@ -95,7 +96,7 @@ def run():
                 help = "Es kann nur eine Schulaufgabe aufeinmal verarbeitet werden",
             )
 
-            st.button("Verarbeiten", type="primary", on_click = lambda: _set_file_started('student'))
+            st.button("Verarbeiten", type="primary", on_click = lambda: _set_file_started('student') , disabled=not uploaded_student_files)
                 
             if uploaded_student_files:
                 st.session_state.student_files = uploaded_student_files
