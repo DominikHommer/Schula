@@ -4,25 +4,25 @@ import streamlit as st
 from .llm_pipeline import LLMPipeline
 
 from libs.file_helper import save_temp_file, normalize_paths
-from models.parser.assignment_sheet import AssignmentSheet  # aufgabenblatt
-from models.parser.model_solution import ModelSolution  # musterlösung/erwartungshorizont
-from models.parser.schulbuch_seite import SchulbuchSeite # Schulbuch not needed yet
+from models.parser.assignment_sheet import AssignmentSheet
+from models.parser.model_solution import ModelSolution
+from models.parser.schulbuch_seite import SchulbuchSeite
+from models.parser.student_text import StudentText 
 from modules.structured_document_parser import StructuredDocumentParser
 
 class PdfProcessorPipeline(LLMPipeline):
     """
-    Png Processing Pipeline mit vordefinierten Stages.
-    Sollte im Streamlit Kontext verwendet werden
+    Verarbeitet PDFs und implementiert eine zweistufige Logik für Schülerantworten,
+    um hohe Textqualität und eine saubere Datenstruktur zu gewährleisten.
     """
     def __init__(self, input_data: dict | None = None):
         super().__init__(input_data)
 
     def process_streamlit(self, uploaded_files, file_type):
         attribute_processed = f"{file_type}_file_processed"
-
         results = []
-
         paths = []
+
         for uploaded_file in uploaded_files:
             path = save_temp_file(uploaded_file, prefix=file_type)
             paths.append(path)
@@ -40,67 +40,40 @@ class PdfProcessorPipeline(LLMPipeline):
                     progress_bar.progress(current_page / total_pages)
                     status.text(f"Verarbeite Seite {current_page} von {total_pages}")
 
-                if file_type == "task": # Aufgabenstellung
+                schema = None
+                prompt = ""
+
+                if file_type == "task":
                     schema = AssignmentSheet 
-                    prompt = "Bitte analysiere das Aufgabenblatt und gib eine strukturierte JSON-Darstellung zur Aufgabenstellung zurück."
-                elif file_type == "solution": # Musterlösung/Erwartungshorizont
+                    prompt = "Bitte analysiere das Aufgabenblatt und gib eine strukturierte JSON-Darstellung zur Aufgabenstellung zurück."
+                elif file_type == "solution":
                     schema = ModelSolution
-                    prompt = "Bitte analysiere die Musterlösung und gib eine strukturierte JSON-Darstellung zurück."
-                elif file_type == "schoolbook": # currently not really needed but maybe in the future!
-                    schema = SchulbuchSeite
-                    prompt = "Bitte transkribiere die Schulbuchseite und gib eine strukturierte JSON-Darstellung zurück."
+                    prompt = "Bitte analysiere die Musterlösung und gib eine strukturierte JSON-Darstellung zurück."
                 elif file_type == "student":
-                    schema = ModelSolution
-                    prompt = """Bitte transkribiere die Klausur dieses Schülers. Ignoriere hierfür die rote Schrift des Lehrers
-                    und sämtliche so gekennzeichnete Verbesserungen, Durschstreichungen oder sonstige Markierungen. Für die Zuordnung der Aufgaben, 
-                    achte auf Beschriftungen im Text wie Zahlen wie '1','2' (NICHT zweitens, erstens oder ähnliches!) etc. oder z.B. 'Aufgabe' mit einer anschließenden Zahl (diese kann auch mal vergessen werden, gehe dann chronologisch vor)
-                    die gesondert über einen Textparagraphen stehen."""
+                    # Direkte Verwendung des einfachen Schemas mit passendem Prompt
+                    schema = StudentText
+                    prompt = """Bitte transkribiere den gesamten handgeschriebenen Text auf dieser Seite als einen einzigen, zusammenhängenden Block. 
+                               Ignoriere dabei rote Schrift des Lehrers, sämtliche Korrekturen, Durchstreichungen oder sonstige Markierungen. 
+                               Gib ausschließlich den reinen, unstrukturierten Text des Schülers zurück."""
                 else:
-                    st.error("Unkown Use Case")
+                    st.error("Unbekannter Anwendungsfall")
                     return
                 
-                parser = StructuredDocumentParser(schema_model=schema, prompt=prompt, debug=False, callback = update_progress)
+                parser = StructuredDocumentParser(schema_model=schema, prompt=prompt, debug=False, callback=update_progress)
 
                 try:
-<<<<<<< HEAD
-                    results = parser.process({"paths": paths})
-                    st.session_state[file_type + "_results"] = results
-=======
-                    # Das Ergebnis vom Parser ist hier noch im komplexen Format (z.B. ModelSolution)
-                    complex_results = parser.process({"paths": paths})
+                    # Das Ergebnis vom Parser kommt direkt im richtigen Format (Liste von StudentText-Objekten).
+                    # Eine komplexe Umwandlung ist nicht mehr nötig.
+                    final_results = parser.process({"paths": paths})
                     
-                    final_results = []
-                    if file_type == "student": #for displaying student text
-                        for res in complex_results:
-                            full_text_parts = []
-                            if res.raw_text:
-                                full_text_parts.append(res.raw_text)
-                            elif res.solutions:
-                                for solution in res.solutions:
-                                    if solution.solution_text:
-                                        full_text_parts.append(solution.solution_text)
-                                    if solution.subsolutions:
-                                        for sub in solution.subsolutions:
-                                            if sub.solution:
-                                                full_text_parts.append(sub.solution)
-                            
-                            
-                            cleaned_parts = [part.strip() for part in full_text_parts if part and part.strip()]
-                            collected_text = "\n\n".join(cleaned_parts)
-                            
-                            simple_obj = StudentText(raw_text=collected_text)
-                            final_results.append(simple_obj)
-                    else:
-                        final_results = complex_results
-
-                    # Nur das finale (ggf. transformierte) Ergebnis wird gespeichert
+                    # Speichere das finale Ergebnis direkt in der Session.
                     st.session_state[file_type + "_results"] = final_results
->>>>>>> 23130e8 (added pydantic model for displaying student plain text)
                     st.session_state[file_type + "_text"] = json.dumps(
-                        [r.model_dump() for r in results], indent=2, ensure_ascii=False
+                        [r.model_dump() for r in final_results], indent=2, ensure_ascii=False
                     )
                     st.session_state[attribute_processed] = True
                     st.success("PDF erfolgreich analysiert.")
+
                 except Exception as e:
                     st.error(f"Fehler bei der Verarbeitung: {e}")
                 finally:
