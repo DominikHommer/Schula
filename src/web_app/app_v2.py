@@ -53,6 +53,8 @@ def run():
     def _set_file_started(type: str):
         st.session_state[type + '_started'] = True
 
+    st.session_state.step = 4
+
     _allowed_types = ["pdf", "jpg", "jpeg", "png"]
     # Schritt 1: Musterlösung hochladen
     if st.session_state.step == 1:
@@ -200,6 +202,24 @@ def run():
         st.subheader("Auswertung der Schülerantworten")
         st.markdown("---")
 
+        # Buttons for resetting the states
+        with st.sidebar:
+            st.markdown("<h2 style='text-align:left; color:#FF4B4B;'>Resets (Achtung)</h2>", unsafe_allow_html=True)
+            # student text
+            if st.button(label="Schülerklausur", help="Setzt die extrahierte Schülerklausur zurück und ermöglicht das Hochladen neuer Dateien."):
+                st.session_state.step = 2
+                st.session_state.student_files = None
+                st.session_state['student_started'] = False
+                st.rerun()
+            # solution text
+            if st.button(label="Schülerklausur und Musterlösung", help="Setzt die extrahierte Schülerklausur und Musterlösung zurück und ermöglicht das Hochladen neuer Dateien."):
+                st.session_state.step = 1
+                st.session_state.student_files = None
+                st.session_state.solution_files = None
+                st.session_state['student_started'] = False
+                st.session_state['solution_started'] = False
+                st.rerun()
+                    
         try:
             responses: dict = st.session_state.extraction_text
 
