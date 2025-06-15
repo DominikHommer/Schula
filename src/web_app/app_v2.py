@@ -151,45 +151,19 @@ def run():
         with cols[1]:
             st.markdown("**Schulaufgabe**")
             
-            try:
-                # This block now intelligently handles both the old and new data structures.
-                data = json.loads(st.session_state.student_text)
-                full_text = []
-
-                # Handle new, simple format: {"raw_text": "..."}
-                if isinstance(data, dict) and 'raw_text' in data:
-                    full_text.append(data['raw_text'])
-                
-                # Handle old, complex format (list of dicts) by iterating through it
-                elif isinstance(data, list):
-                    for block in data:
-                        if isinstance(block, dict):
-                            # Prioritize 'raw_text' as it's the most complete
-                            if block.get("raw_text"):
-                                full_text.append(block.get("raw_text"))
-                            # Fallback to collecting text from solutions
-                            elif block.get("solutions"):
-                                for solution in block.get("solutions"):
-                                    if solution.get("solution_text"):
-                                        full_text.append(solution.get("solution_text"))
-                                    if solution.get("subsolutions"):
-                                        for sub in solution.get("subsolutions"):
-                                            if sub.get("solution"):
-                                                full_text.append(sub.get("solution"))
-                
-                if full_text:
-                    st.write("**Gesamte Transkription der Schülerantwort:**")
-                    # Display the collected text directly on the page
-                    st.markdown("\n\n".join(full_text))
-                else:
-                    # If JSON is valid but no text could be extracted
-                    st.warning("Dokument hat eine valide Struktur, aber es konnte kein Text extrahiert werden.")
-                    st.code(st.session_state.student_text, language="json")
-
-            except Exception:
-                # If the text is not a valid JSON at all, display it directly.
-                st.write("**Extrahierter Rohtext (keine JSON-Struktur erkannt):**")
-                st.markdown(st.session_state.student_text if st.session_state.student_text else "Kein Text extrahiert.")
+            if 'student_results' in st.session_state and st.session_state.student_results:
+                try:
+                    results = st.session_state.student_results
+                    
+                    full_text = "\n\n".join([res.raw_text for res in results if res.raw_text])
+                    
+                    st.markdown(full_text) 
+                    
+                except Exception as e:
+                    st.error(f"Fehler bei der Anzeige des Schülertextes: {e}")
+                    st.json(st.session_state.student_text) 
+            else:
+                st.warning("Kein Schülertext zur Anzeige vorhanden.")
 
         if st.button("Extrahieren"):
             responses = LLMTextExtractorPipeline(llmClient).process_solutions(st.session_state.solution_results[0], st.session_state.student_results[0])

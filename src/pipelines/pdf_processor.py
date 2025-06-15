@@ -1,12 +1,14 @@
 import json
 import os
+import sys
 import streamlit as st
-from .llm_pipeline import LLMPipeline
 
+from .llm_pipeline import LLMPipeline
 from libs.file_helper import save_temp_file, normalize_paths
 from models.parser.assignment_sheet import AssignmentSheet  # aufgabenblatt
 from models.parser.model_solution import ModelSolution  # musterlösung/erwartungshorizont
 from models.parser.schulbuch_seite import SchulbuchSeite # Schulbuch not needed yet
+from models.parser.student_text import StudentText 
 from modules.structured_document_parser import StructuredDocumentParser
 
 class PdfProcessorPipeline(LLMPipeline):
@@ -42,17 +44,18 @@ class PdfProcessorPipeline(LLMPipeline):
 
                 if file_type == "task": # Aufgabenstellung
                     schema = AssignmentSheet 
-                    prompt = "Bitte analysiere das Aufgabenblatt und gib eine strukturierte JSON-Darstellung zur Aufgabenstellung zurück."
+                    prompt = "Bitte analysiere das Aufgabenblatt und gib eine strukturierte JSON-Darstellung zur Aufgabenstellung zurück."
                 elif file_type == "solution": # Musterlösung/Erwartungshorizont
                     schema = ModelSolution
-                    prompt = "Bitte analysiere die Musterlösung und gib eine strukturierte JSON-Darstellung zurück."
+                    prompt = "Bitte analysiere die Musterlösung und gib eine strukturierte JSON-Darstellung zurück."
                 elif file_type == "schoolbook": # currently not really needed but maybe in the future!
                     schema = SchulbuchSeite
-                    prompt = "Bitte transkribiere die Schulbuchseite und gib eine strukturierte JSON-Darstellung zurück."
+                    prompt = "Bitte transkribiere die Schulbuchseite und gib eine strukturierte JSON-Darstellung zurück."
                 elif file_type == "student":
-                    schema = ModelSolution
-                    prompt = """Bitte transkribiere die Klausur dieses Schülers. Ignoriere hierfür die rote Schrift des Lehrers
-                    und sämtliche so gekennzeichnete Verbesserungen, Durschstreichungen oder sonstige Markierungen."""
+                    schema = StudentText 
+                    prompt = """Bitte transkribiere den gesamten handgeschriebenen Text auf dieser Seite als einen einzigen, zusammenhängenden Block. 
+                               Ignoriere dabei rote Schrift des Lehrers, sämtliche Korrekturen, Durchstreichungen oder sonstige Markierungen. 
+                               Gib ausschließlich den reinen, unstrukturierten Text des Schülers zurück."""
                 else:
                     st.error("Unkown Use Case")
                     return
