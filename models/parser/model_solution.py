@@ -15,4 +15,4 @@ class ModelSolution(BaseModel):
     assignment_title: Optional[str] = Field(None, description="Titel des zugehörigen Aufgabenblatts")
     subject: Optional[str] = Field(None, description="Fach der Lösung, z. B. 'Deutsch', 'Mathe'")
     solutions: List[TaskSolution] = Field(..., description="Lösungen zu allen Aufgaben")
-    raw_text: Optional[str] = Field(None, description="Kompletter erkannter Text der Musterlösung, falls OCR-basiert")
+    raw_text: Optional[str] = Field(None, description="Kompletter erkannter Text")

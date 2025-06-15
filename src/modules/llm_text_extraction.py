@@ -43,28 +43,13 @@ class LLMExtraction(LLMModule):
         3.  **Zuordung zur Aufgabe**: Da dir wohlmöglich die gesamte Klausur zur Verfügung gestellt wird merke es an, dass die Lösung der Aufgabe in einer anderen Aufgabe erwähnt wurde, falls es dir ersichtlich scheint.
         4.  **Klare Antwort**: Antworte nur mit für die dir gestellte Aufgabe relevanten Information, KEINE Abschließenden Worte oder sonstige Anmerkunge die unrelevant sind.   """)
     
-    # See here: https://python.langchain.com/docs/how_to/structured_output/#typeddict-or-json-schema
-    # Is not needed anymore, since we want to display the text right away
-    # def get_structured_output(self) -> dict:
-    #     return {
-    #         'title': 'Extracted Tasks',
-    #         'description': 'Tasks extracted from given essay',
-    #         'type': 'object',
-    #         'properties': {
-    #             'extracted_essay': {
-    #                 'type': 'array',
-    #                 'description': 'Complete content of essay for a task',
-    #                 'items': {
-    #                     'type': 'string',
-    #                     'description': 'Content from essay for task'
-    #                 }
-    #             }
-    #         },
-    #         'required': ['extracted_essay'],
-    #     }
-    
+    def get_structured_output():
+        pass
+
     def process(self, data: dict, llm: LanguageClient) -> list:
+        ## TODO: use a structured output here
+        #llm.use_structured_output(self.get_structured_output())
 
-        result = llm.get_response([self.get_system_prompt(data["student_text"], data["solution_text"])])
-
-        return result
+        return llm.get_response([
+            self.get_system_prompt(data["student_text"], data["solution_text"])
+        ])

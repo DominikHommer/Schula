@@ -26,9 +26,6 @@ def _combine_task_solution_text(task_model: ModelSolution) -> str:
             
     return "\n".join(parts) if parts else "No text provided for this task."
 
-
-
-
 class LLMTextExtractorPipeline(LLMPipeline):
     """
     Pipeline zur Extraktion der Musterlösung aus dem Schülertext

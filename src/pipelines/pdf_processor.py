@@ -52,9 +52,7 @@ class PdfProcessorPipeline(LLMPipeline):
                 elif file_type == "student":
                     schema = ModelSolution
                     prompt = """Bitte transkribiere die Klausur dieses Schülers. Ignoriere hierfür die rote Schrift des Lehrers
-                    und sämtliche so gekennzeichnete Verbesserungen, Durschstreichungen oder sonstige Markierungen. Für die Zuordnung der Aufgaben, 
-                    achte auf Beschriftungen im Text wie Zahlen wie '1','2' (NICHT zweitens, erstens oder ähnliches!) etc. oder z.B. 'Aufgabe' mit einer anschließenden Zahl (diese kann auch mal vergessen werden, gehe dann chronologisch vor)
-                    die gesondert über einen Textparagraphen stehen."""
+                    und sämtliche so gekennzeichnete Verbesserungen, Durschstreichungen oder sonstige Markierungen."""
                 else:
                     st.error("Unkown Use Case")
                     return
