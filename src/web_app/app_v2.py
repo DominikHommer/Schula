@@ -149,6 +149,7 @@ def run():
         with cols[1]:
             st.markdown("**Schulaufgabe**")
             
+<<<<<<< HEAD
             try:
     
                 data = json.loads(st.session_state.student_text)
@@ -188,6 +189,21 @@ def run():
                 # If the text is not a valid JSON  display it directly.
                 st.write("**Extrahierter Rohtext (keine JSON-Struktur erkannt):**")
                 st.markdown(st.session_state.student_text if st.session_state.student_text else "Kein Text extrahiert.")
+=======
+            if 'student_results' in st.session_state and st.session_state.student_results:
+                try:
+                    results = st.session_state.student_results
+                    
+                    full_text = "\n\n".join([res.raw_text for res in results if res.raw_text])
+                    
+                    st.markdown(full_text) 
+                    
+                except Exception as e:
+                    st.error(f"Fehler bei der Anzeige des Schülertextes: {e}")
+                    st.json(st.session_state.student_text) # Fallback zur Anzeige des rohen JSON
+            else:
+                st.warning("Kein Schülertext zur Anzeige vorhanden.")
+>>>>>>> 23130e8 (added pydantic model for displaying student plain text)
 
         if st.button("Extrahieren"):
             responses = LLMTextExtractorPipeline(llmClient).process_solutions(st.session_state.solution_results[0], st.session_state.student_results[0])

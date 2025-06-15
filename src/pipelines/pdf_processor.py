@@ -62,8 +62,40 @@ class PdfProcessorPipeline(LLMPipeline):
                 parser = StructuredDocumentParser(schema_model=schema, prompt=prompt, debug=False, callback = update_progress)
 
                 try:
+<<<<<<< HEAD
                     results = parser.process({"paths": paths})
                     st.session_state[file_type + "_results"] = results
+=======
+                    # Das Ergebnis vom Parser ist hier noch im komplexen Format (z.B. ModelSolution)
+                    complex_results = parser.process({"paths": paths})
+                    
+                    final_results = []
+                    if file_type == "student": #for displaying student text
+                        for res in complex_results:
+                            full_text_parts = []
+                            if res.raw_text:
+                                full_text_parts.append(res.raw_text)
+                            elif res.solutions:
+                                for solution in res.solutions:
+                                    if solution.solution_text:
+                                        full_text_parts.append(solution.solution_text)
+                                    if solution.subsolutions:
+                                        for sub in solution.subsolutions:
+                                            if sub.solution:
+                                                full_text_parts.append(sub.solution)
+                            
+                            
+                            cleaned_parts = [part.strip() for part in full_text_parts if part and part.strip()]
+                            collected_text = "\n\n".join(cleaned_parts)
+                            
+                            simple_obj = StudentText(raw_text=collected_text)
+                            final_results.append(simple_obj)
+                    else:
+                        final_results = complex_results
+
+                    # Nur das finale (ggf. transformierte) Ergebnis wird gespeichert
+                    st.session_state[file_type + "_results"] = final_results
+>>>>>>> 23130e8 (added pydantic model for displaying student plain text)
                     st.session_state[file_type + "_text"] = json.dumps(
                         [r.model_dump() for r in results], indent=2, ensure_ascii=False
                     )
