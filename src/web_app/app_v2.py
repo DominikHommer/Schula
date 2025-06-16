@@ -1,4 +1,5 @@
 import json
+import pandas as pd
 import streamlit as st
 from pdf2image import convert_from_bytes
 from langchain_core.messages import AIMessage, HumanMessage
@@ -7,8 +8,8 @@ from libs.language_client import LanguageClient
 from pipelines.pdf_processor import PdfProcessorPipeline
 from pipelines.llm_extractor import LLMTextExtractorPipeline
 from pipelines.student_exam_extractor import StudentExamProcessorPipeline
+from models.parser.extraction_result import ExtractionResult
 
-CV_PIPELINE=False
 llmClient = LanguageClient()
 _studenExamProcessorPipeline = StudentExamProcessorPipeline()
 _pdfProcessorPipeline = PdfProcessorPipeline()
@@ -43,7 +44,7 @@ def show_progress():
     )
 
 def run():
-    st.set_page_config(page_title="Helferlein", layout="centered")
+    st.set_page_config(page_title="Helferlein", layout="wide")
     app_session_init()
 
     # Persistenter Header
@@ -52,8 +53,6 @@ def run():
 
     def _set_file_started(type: str):
         st.session_state[type + '_started'] = True
-
-    st.session_state.step = 4
 
     _allowed_types = ["pdf", "jpg", "jpeg", "png"]
     # Schritt 1: Musterlösung hochladen
@@ -165,7 +164,7 @@ def run():
             else:
                 st.warning("Kein Schülertext zur Anzeige vorhanden.")
 
-        if st.button("Extrahieren"):
+        if st.button("Extrahieren", type="primary"):
             responses = LLMTextExtractorPipeline(llmClient).process_solutions(st.session_state.solution_results[0], st.session_state.student_results[0])
             st.session_state.extraction_started = True
             st.session_state.extraction_text = responses
@@ -184,6 +183,7 @@ def run():
                 st.session_state.step = 2
                 st.session_state.student_files = None
                 st.session_state['student_started'] = False
+                st.session_state.extraction_text = None
                 st.rerun()
             # solution text
             if st.button(label="Schülerklausur und Musterlösung", help="Setzt die extrahierte Schülerklausur und Musterlösung zurück und ermöglicht das Hochladen neuer Dateien."):
@@ -192,26 +192,51 @@ def run():
                 st.session_state.solution_files = None
                 st.session_state['student_started'] = False
                 st.session_state['solution_started'] = False
+                st.session_state.extraction_text = None
                 st.rerun()
                     
         try:
-            responses: dict = st.session_state.extraction_text
+            # This is a dict like {'1': ExtractionResult(...), '2': ExtractionResult(...)}
+            responses = st.session_state.extraction_text
 
             if not isinstance(responses, dict):
                 st.warning("Die Antwort ist kein Dictionary.")
             else:
+                # Loop through the dictionary, sorting by task number
                 for key in sorted(responses.keys(), key=lambda x: int(x)):
-                    msg = responses[key]
-                    if isinstance(msg, AIMessage):
-                        st.markdown(f"### Aufgabe {key}")
-                        st.markdown(msg.content)
-                        st.markdown("---")
-                    else:
-                        st.write(f"Aufgabe {key}: Kein AIMessage-Objekt gefunden.")
-                        
+                    # 'extraction_result' is ALREADY the parsed Pydantic object.
+                    extraction_result = responses[key]
+                    # st.write(extraction_result)
+
+                    st.markdown(f"## Aufgabe {key}")
+
+                    try:
+
+                        # Flatten data for table display (this part is correct)
+                        table_data = []
+                        for item in extraction_result.results:
+                            for aspekt in item.Aspekt:
+                                table_data.append({
+                                    "Teilaufgabe": aspekt.Aspekt,
+                                    "Beleg Schüleraufsatz": aspekt.Beleg_Schüleraufsatz,
+                                    "Kommentar": aspekt.Kommentar
+                                })
+
+                        if table_data:
+                            df = pd.DataFrame(table_data)
+                            st.dataframe(df, use_container_width=True, hide_index=True, row_height=100)
+                        else:
+                            st.info("Keine relevanten Aspekte für diese Aufgabe gefunden.")
+
+                    except Exception as e:
+                        st.error(f"Fehler beim Darstellen der Daten für Aufgabe {key}: {e}")
+                        # Fallback: display the raw object representation
+                        st.write(extraction_result)
+
+                    st.markdown("---")
+
         except Exception as e:
             st.error(f"Fehler beim Anzeigen der Extraktion: {e}")
-
             
     else:
         st.subheader("Ungültiger Step")
