@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from pdf2image import convert_from_path
 from pydantic import BaseModel
 from langchain_ollama import ChatOllama
+from langchain_groq import ChatGroq
 from langchain_core.messages import SystemMessage, HumanMessage
 
 from .module_base import Module
@@ -21,8 +22,16 @@ class StructuredDocumentParser(Module):
         super().__init__("structured-document-parser")
         load_dotenv()
         ### Groq ###
-        self.api_key = os.getenv("GROQ_API_KEY")
-        self.client = Groq(api_key=self.api_key)
+        #self.api_key = os.getenv("GROQ_API_KEY")
+        #self.client = Groq(api_key=self.api_key)
+        self.llm = ChatGroq(
+            model="meta-llama/llama-4-scout-17b-16e-instruct",
+            temperature=0.2,
+            max_tokens=None,
+            timeout=None,
+            max_retries=2,
+        ).with_structured_output(schema_model)
+
         self.schema_model = schema_model
         self.prompt_text = prompt
         self.schema_json = schema_model.model_json_schema()
@@ -74,21 +83,21 @@ class StructuredDocumentParser(Module):
             for attempt in range(1, 6):
                 try:
                     ### Groq ###
-                    completion = self.client.chat.completions.create(
-                        model="meta-llama/llama-4-scout-17b-16e-instruct",
-                        messages=messages,
-                        temperature=0.3,
-                        max_completion_tokens=3000,
-                        top_p=1,
-                        stream=False,
-                        response_format={"type": "json_object"},
-                    )
-                    raw = completion.choices[0].message.content
-                    parsed_data = json.loads(raw) if isinstance(raw, str) else raw
-                    parsed = self.schema_model(**parsed_data)
+                    #completion = self.client.chat.completions.create(
+                    #    model="meta-llama/llama-4-scout-17b-16e-instruct",
+                    #    messages=messages,
+                    #    temperature=0.3,
+                    #    max_completion_tokens=3000,
+                    #    top_p=1,
+                    #    stream=False,
+                    #    response_format={"type": "json_object"},
+                    #)
+                    #raw = completion.choices[0].message.content
+                    #parsed_data = json.loads(raw) if isinstance(raw, str) else raw
+                    #parsed = self.schema_model(**parsed_data)
 
                     ### Gemma ###
-                    # parsed = self.llm.invoke(messages)
+                    parsed = self.llm.invoke(messages)
                     break
                 except Exception as e:
                     print(f"[Parser] Fehler bei Seite {i+1} (Versuch {attempt}): {e}")

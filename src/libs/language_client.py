@@ -1,4 +1,5 @@
 from langchain_ollama import ChatOllama
+from langchain_groq import ChatGroq
 from langchain_core.messages import BaseMessage
 from langchain_core.language_models.chat_models import BaseChatModel
 from pydantic import BaseModel
@@ -15,6 +16,15 @@ class LanguageClient():
     # "deepseek-r1:70b"
     def __init__(self, model: str="gemma3:27b"):
         self.model = ChatOllama(model=model)
+
+        # REMOVE IF GROQ NOT USED
+        self.model = ChatGroq(
+            model="meta-llama/llama-4-scout-17b-16e-instruct",
+            temperature=0.2,
+            max_tokens=None,
+            timeout=None,
+            max_retries=2,
+        )
 
     def use_structured_output(self, json_schema: dict):
         """

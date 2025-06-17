@@ -55,7 +55,7 @@ class PdfProcessorPipeline(LLMPipeline):
                     schema = StudentText 
                     prompt = """Bitte transkribiere den gesamten handgeschriebenen Text auf dieser Seite als einen einzigen, zusammenhängenden Block. 
                                Ignoriere dabei rote Schrift des Lehrers, sämtliche Korrekturen, Durchstreichungen oder sonstige Markierungen. 
-                               Gib ausschließlich den reinen, unstrukturierten Text des Schülers zurück."""
+                               Gib ausschließlich den reinen, unstrukturierten Text des Schülers zurück. Bitte escape Anführungszeichen (\")."""
                 else:
                     st.error("Unkown Use Case")
                     return
