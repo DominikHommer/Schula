@@ -3,6 +3,9 @@ from langchain_groq import ChatGroq
 from langchain_core.messages import BaseMessage
 from langchain_core.language_models.chat_models import BaseChatModel
 from pydantic import BaseModel
+import os
+import dotenv
+dotenv.load_dotenv()
 
 class LanguageClient():
     """
@@ -20,6 +23,7 @@ class LanguageClient():
         # REMOVE IF GROQ NOT USED
         self.model = ChatGroq(
             model="meta-llama/llama-4-scout-17b-16e-instruct",
+            api_key= os.environ.get("GROQ_API_KEY"),
             temperature=0.2,
             max_tokens=None,
             timeout=None,
