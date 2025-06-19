@@ -46,7 +46,6 @@ def show_progress():
 def run():
     st.set_page_config(page_title="Helferlein", layout="wide")
     app_session_init()
-
     # Persistenter Header
     st.markdown("<h1 style='text-align:center;'>Helferlein</h1>", unsafe_allow_html=True)
     st.divider()
@@ -65,6 +64,8 @@ def run():
                 key = "solution_uploader",
                 accept_multiple_files = True,
             )
+
+            st.info("Bitte lade ausschließlich die Musterlösung hoch und nicht die Aufgabenstellung aus der Klausur!")
 
             if st.button("Verarbeiten", type="primary", on_click = lambda: _set_file_started('solution'), disabled=not uploaded_solution_files):
                 st.rerun()
@@ -104,7 +105,7 @@ def run():
             uploaded_student_files = st.session_state.student_files
             try:
                 _pdfProcessorPipeline.process_streamlit(uploaded_student_files, "student")
-                #_studenExamProcessorPipeline.process_streamlit(uploaded_solution_files, "student")
+                # _studenExamProcessorPipeline.process_streamlit(uploaded_student_files, "student")
                 st.session_state.step = 3
                 st.rerun()
             except Exception as e:
@@ -152,9 +153,9 @@ def run():
             
             if 'student_results' in st.session_state and st.session_state.student_results:
                 try:
-                    results = st.session_state.student_results
+                    result = st.session_state.student_results
                     
-                    full_text = "\n\n".join([res.raw_text for res in results if res.raw_text])
+                    full_text = result.raw_text
                     
                     st.markdown(full_text) 
                     
@@ -165,11 +166,11 @@ def run():
                 st.warning("Kein Schülertext zur Anzeige vorhanden.")
 
         if st.button("Extrahieren", type="primary"):
-            responses = LLMTextExtractorPipeline(llmClient).process_solutions(st.session_state.solution_results[0], st.session_state.student_results[0])
-            st.session_state.extraction_started = True
-            st.session_state.extraction_text = responses
-            st.session_state.step = 4
-            st.rerun()
+                responses = LLMTextExtractorPipeline(llmClient).process_solutions(st.session_state.solution_results, st.session_state.student_results)
+                st.session_state.extraction_started = True
+                st.session_state.extraction_text = responses
+                st.session_state.step = 4
+                st.rerun()
             
     elif st.session_state.step == 4:
         st.subheader("Auswertung der Schülerantworten")
@@ -196,30 +197,25 @@ def run():
                 st.rerun()
                     
         try:
-            # This is a dict like {'1': ExtractionResult(...), '2': ExtractionResult(...)}
             responses = st.session_state.extraction_text
 
             if not isinstance(responses, dict):
                 st.warning("Die Antwort ist kein Dictionary.")
             else:
-                # Loop through the dictionary, sorting by task number
                 for key in sorted(responses.keys(), key=lambda x: int(x)):
-                    # 'extraction_result' is ALREADY the parsed Pydantic object.
                     extraction_result = responses[key]
-                    # st.write(extraction_result)
 
                     st.markdown(f"## Aufgabe {key}")
 
                     try:
-
-                        # Flatten data for table display (this part is correct)
                         table_data = []
                         for item in extraction_result.results:
                             for aspekt in item.Aspekt:
                                 table_data.append({
                                     "Teilaufgabe": aspekt.Aspekt,
-                                    "Beleg Schüleraufsatz": aspekt.Beleg_Schüleraufsatz,
-                                    "Kommentar": aspekt.Kommentar
+                                    "Musterlösung": aspekt.Beleg_Musterlösung,
+                                    "Schüleraufsatz": aspekt.Beleg_Schüleraufsatz,
+                                    "Anmerkungen": aspekt.Kommentar
                                 })
 
                         if table_data:
@@ -230,7 +226,6 @@ def run():
 
                     except Exception as e:
                         st.error(f"Fehler beim Darstellen der Daten für Aufgabe {key}: {e}")
-                        # Fallback: display the raw object representation
                         st.write(extraction_result)
 
                     st.markdown("---")

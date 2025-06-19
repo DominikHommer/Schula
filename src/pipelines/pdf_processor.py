@@ -34,7 +34,7 @@ class PdfProcessorPipeline(LLMPipeline):
             return
 
         if not st.session_state.get(attribute_processed, False):
-            with st.spinner("Verarbeite PDF..."):
+            with st.spinner("Verarbeite Datei..."):
                 progress_bar = st.progress(0.0)
                 status = st.empty()
 
@@ -61,15 +61,15 @@ class PdfProcessorPipeline(LLMPipeline):
                     return
                 
                 parser = StructuredDocumentParser(schema_model=schema, prompt=prompt, debug=False, callback = update_progress)
-
+                
                 try:
-                    results = parser.process({"paths": paths})
-                    st.session_state[file_type + "_results"] = results
+                    final_solution = parser.process({"paths": paths})
+                    st.session_state[file_type + "_results"] = final_solution
                     st.session_state[file_type + "_text"] = json.dumps(
-                        [r.model_dump() for r in results], indent=2, ensure_ascii=False
+                        final_solution.model_dump(), indent=2, ensure_ascii=False
                     )
                     st.session_state[attribute_processed] = True
-                    st.success("PDF erfolgreich analysiert.")
+                    st.success("Dateien erfolgreich analysiert.")
                 except Exception as e:
                     st.error(f"Fehler bei der Verarbeitung: {e}")
                 finally:

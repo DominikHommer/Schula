@@ -16,3 +16,9 @@ class ModelSolution(BaseModel):
     subject: Optional[str] = Field(None, description="Fach der Lösung, z. B. 'Deutsch', 'Mathe'")
     solutions: List[TaskSolution] = Field(..., description="Lösungen zu allen Aufgaben")
     raw_text: Optional[str] = Field(None, description="Kompletter erkannter Text")
+
+# --- NEW INTERNAL MODEL ---
+class PageExtraction(BaseModel):
+    """Represents the content extracted from a single page."""
+    tasks: List[TaskSolution] = Field(..., description="A list of all complete or partial tasks found on this single page.")
+    is_first_task_a_continuation: bool = Field(False, description="Set to True ONLY if the first task on this page is a direct continuation of the last task from the PREVIOUS page.")

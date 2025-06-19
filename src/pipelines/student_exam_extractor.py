@@ -12,7 +12,7 @@ from libs.file_helper import save_temp_file
 
 from .cv_pipeline import CVPipeline
 
-from models.parser.model_solution import ModelSolution
+from models.parser.student_text import StudentText
 
 class StudentExamProcessorPipeline(CVPipeline):
     """
@@ -55,19 +55,7 @@ class StudentExamProcessorPipeline(CVPipeline):
                         #--- Pydantic Model for consistency
                         extracted_text = " ".join(extracted_text_list)
 
-                        student_solution_output = ModelSolution(
-                            assignment_title="Handwritten Assignment", 
-                            subject=None,
-                            solutions=[
-                                ModelSolution(
-                                    number=1,  # Assuming it's the first and only task
-                                    title="Main Task Solution",
-                                    solution_text=extracted_text,
-                                    subsolutions=[]  # Explicitly an empty list as there are no subsolutions
-                                )
-                            ],
-                            raw_text=extracted_text  # Store the full raw text here as well
-                        )
+                        student_solution_output = StudentText(raw_text=extracted_text)
 
                         st.session_state[file_type+"_text"] =  student_solution_output
                     elif isinstance(extracted_text_list, str):

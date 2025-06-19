@@ -25,8 +25,7 @@ class LLMExtraction(LLMModule):
         return SystemMessage(content=f"""
         Du bist ein sehr präzises Assistenz-LLM, das darauf spezialisiert ist, Musterlösungen einer Klausuraufgabe genaustens zu analysieren.
         Deine Aufgabe ist die entschprechenden Teilaufgaben und Anforderungen im Schülertext zu suchen und wiederzugeben ob diese erfolgreich bearbeitet wurden oder nicht.
-        Hierfür steht dir immer die jeweilige Aufgabe samt Teilaufgaben aus der Musterlösung zur Verfügung. Außerdem die entsprechende Aufgabe aus der Klausur des Schülers.
-        Wenn es bei der Transkripierung zu Problemen kam, wird dir die gesamte Klausur zur Verfügung gestellt, versuche dies ebenfalls bei deiner Zuordnung zu berücksichtigen.
+        Hierfür steht dir immer die jeweilige Aufgabe samt Teilaufgaben aus der Musterlösung zur Verfügung. Außerdem der gesamte Aufsatz des Schülers.
 
         Hier ist der Aufsatz des Schülers:
         --- AUFSATZ START ---
@@ -38,11 +37,13 @@ class LLMExtraction(LLMModule):
         {solution_text}
         --- MUSTERLÖSUNG ENDE---
 
-        **Wichtige Anweisungen für die Zuordnung jedes Satzes:**
+        **Wichtige Anweisungen für die Zuordnung:**
         1.  **Ausgabe Sprache**: Antworte auf Deutsch.
         2.  **Fehlerhafter Aufsatz**: Beachte, dass der Aufsatz durch eine Handschrifterkennung transkripiert wurde, weshalb dieser erhebliche Rechtschreib-, Grammatik- und Logikfehler aufweisen kann, welche nicht auf den Schüler zurückzuführen sind. Versuche dies bei der Zuordnung zu berücksichtigen.
-        3.  **Zuordung zur Aufgabe**: Da dir wohlmöglich die gesamte Klausur zur Verfügung gestellt wird merke es an, dass die Lösung der Aufgabe in einer anderen Aufgabe erwähnt wurde, falls es dir ersichtlich scheint.
+        3.  **Zuordung zur Aufgabe**: Da dir die gesamte Klausur zur Verfügung gestellt wird merke es an, dass die Lösung der Aufgabe in einer anderen Aufgabe erwähnt wurde, falls es dir ersichtlich scheint.
         4.  **Klare Antwort**: Antworte nur mit für die dir gestellte Aufgabe relevanten Information, KEINE Abschließenden Worte oder sonstige Anmerkunge die unrelevant sind.
+        5.  **Struktur Aufsatz**: Teilaspekte zu einer Aufgabe können mit größeren Abständen im Aufsatz genannt werden. Falls diese klar zu einer Aufgabe zugeordnert werden können.
+        6.  **Zuordnung anhand Apekte in Musterlösung**: Suche lediglich nach Aspketen die in der Musterlösung der Aufgabe aufgeführt werden und versuche nicht um jeden Preis Zordnungen zu finden. Gib diese nur wieder wenn sie wirklich im Schülertext behandelt wurden. 
 
          --- Antwortstruktur ---
         Halte dich bei der Antwort streng an folgendes json-schema:
