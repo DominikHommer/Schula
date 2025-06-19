@@ -22,8 +22,6 @@ class PdfProcessorPipeline(LLMPipeline):
     def process_streamlit(self, uploaded_files, file_type):
         attribute_processed = f"{file_type}_file_processed"
 
-        results = []
-
         paths = []
         for uploaded_file in uploaded_files:
             path = save_temp_file(uploaded_file, prefix=file_type)

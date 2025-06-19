@@ -104,7 +104,7 @@ def run():
             uploaded_student_files = st.session_state.student_files
             try:
                 _pdfProcessorPipeline.process_streamlit(uploaded_student_files, "student")
-                #_studenExamProcessorPipeline.process_streamlit(uploaded_solution_files, "student")
+                #_studenExamProcessorPipeline.process_streamlit(uploaded_student_files, "student")
                 st.session_state.step = 3
                 st.rerun()
             except Exception as e:
@@ -131,7 +131,8 @@ def run():
 
                     if block.get("solutions"):
                         for idx, solution in enumerate(block["solutions"], 1):
-                            st.markdown(f"#### Aufgabe {solution.get('number', idx)}")
+                            if solution.get('number', idx) is not None:
+                                st.markdown(f"#### Aufgabe {solution.get('number', idx)}")
                             if solution.get("title"):
                                 st.write(f"**Thema:** {solution['title']}")
                             if solution.get("solution_text"):
@@ -154,7 +155,7 @@ def run():
                 try:
                     results = st.session_state.student_results
                     
-                    full_text = "\n\n".join([res.raw_text for res in results if res.raw_text])
+                    full_text = " ".join([res.raw_text for res in results if res.raw_text])
                     
                     st.markdown(full_text) 
                     
