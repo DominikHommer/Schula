@@ -132,7 +132,8 @@ def run():
 
                     if block.get("solutions"):
                         for idx, solution in enumerate(block["solutions"], 1):
-                            st.markdown(f"#### Aufgabe {solution.get('number', idx)}")
+                            if solution.get('number', idx) is not None:
+                                st.markdown(f"#### Aufgabe {solution.get('number', idx)}")
                             if solution.get("title"):
                                 st.write(f"**Thema:** {solution['title']}")
                             if solution.get("solution_text"):

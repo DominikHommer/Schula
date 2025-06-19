@@ -52,6 +52,6 @@ class CVPipeline(Pipeline):
                 print(f"[CVPipeline] Erkannt Texte gespeichert in: {output_txt}")
             
         if len(ret) == 1:
-            return ret[0]
+            return ret[0], full_text
 
-        return ret
+        return ret, full_text

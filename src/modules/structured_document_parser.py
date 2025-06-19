@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from pdf2image import convert_from_path
 from pydantic import BaseModel
 from langchain_ollama import ChatOllama
+from langchain_groq import ChatGroq
 from langchain_core.messages import SystemMessage, HumanMessage
 from models.parser.model_solution import PageExtraction, ModelSolution, TaskSolution
 from models.parser.student_text import StudentText

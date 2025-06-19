@@ -22,8 +22,6 @@ class PdfProcessorPipeline(LLMPipeline):
     def process_streamlit(self, uploaded_files, file_type):
         attribute_processed = f"{file_type}_file_processed"
 
-        results = []
-
         paths = []
         for uploaded_file in uploaded_files:
             path = save_temp_file(uploaded_file, prefix=file_type)
@@ -55,7 +53,7 @@ class PdfProcessorPipeline(LLMPipeline):
                     schema = StudentText 
                     prompt = """Bitte transkribiere den gesamten handgeschriebenen Text auf dieser Seite als einen einzigen, zusammenhängenden Block. 
                                Ignoriere dabei rote Schrift des Lehrers, sämtliche Korrekturen, Durchstreichungen oder sonstige Markierungen. 
-                               Gib ausschließlich den reinen, unstrukturierten Text des Schülers zurück."""
+                               Gib ausschließlich den reinen, unstrukturierten Text des Schülers zurück. Bitte escape Anführungszeichen (\")."""
                 else:
                     st.error("Unkown Use Case")
                     return
