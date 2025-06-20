@@ -1,12 +1,20 @@
+from typing import List
 from pydantic import BaseModel, Field
+
+class Line(BaseModel):
+    """
+    Eine einzelne Zeile der Transkription.
+    """
+    text: str = Field(
+        ...,
+        description="Der exakte Text dieser Zeile"
+    )
 
 class StudentText(BaseModel):
     """
-    Ein einfaches Datenmodell, das die gesamte unstrukturierte Transkription
-    einer Schülerantwort als Rohtext enthält.
+    Modell, das die Transkription als Liste von Zeilen (mit Nummern) enthält.
     """
-    
-    raw_text: str = Field(
+    lines: List[Line] = Field(
         ...,
-        description="Die vollständige und exakte Transkription des gesamten Textes aus der Schülerantwort."
+        description="Liste aller transkribierten Zeilen."
     )

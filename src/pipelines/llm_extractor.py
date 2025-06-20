@@ -50,8 +50,14 @@ class LLMTextExtractorPipeline(LLMPipeline):
         """
         progress_bar = st.progress(0.0)
         status = st.empty()
+        result: StudentText = st.session_state.student_results
+        annotated = [
+            f"{line.text} [{idx}]"
+            for idx, line in enumerate(result.lines, start=1)
+        ]
+        full_text = "\n".join(annotated)
 
-        raw_student_text = student_solution.raw_text
+        raw_student_text = full_text
 
         llm_responses = {}
         print(f"Processing Assignment: {model_solution.assignment_title or 'N/A'}")
@@ -71,8 +77,7 @@ class LLMTextExtractorPipeline(LLMPipeline):
                 # Progress update
                 progress = (j + 1) / len(model_tasks)
                 progress_bar.progress(progress)
-                status.update(f"Verarbeite Aufgabe: {j + 1} von {total_tasks}")
-
+                status.update(label=f"Verarbeite Aufgabe: {j+1} von {total_tasks}")
 
                 llm_responses[task_id_str] = self.run(data)
                 print(f"Generated prompt for Task {task_id_str} (using full student text).")

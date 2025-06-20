@@ -51,9 +51,11 @@ class PdfProcessorPipeline(LLMPipeline):
                     prompt = "Bitte transkribiere die Schulbuchseite und gib eine strukturierte JSON-Darstellung zurück."
                 elif file_type == "student":
                     schema = StudentText 
-                    prompt = """Bitte transkribiere den gesamten handgeschriebenen Text auf dieser Seite als einen einzigen, zusammenhängenden Block. 
-                               Ignoriere dabei rote Schrift des Lehrers, sämtliche Korrekturen, Durchstreichungen oder sonstige Markierungen. 
-                               Gib ausschließlich den reinen, unstrukturierten Text des Schülers zurück. Bitte escape Anführungszeichen (\")."""
+                    prompt = """"Bitte transkribiere den gesamten handgeschriebenen Text auf dieser Seite. 
+                    Strukturiere die Ausgabe als JSON gemäß dem Pydantic-Modell StudentText, 
+                    das ein Feld `lines` enthält: eine Liste von Objekten mit dem Felde `text` (string). 
+                    Ignoriere rote Schrift, Korrekturen, Durchstreichungen und sonstige Markierungen.
+                    """
                 else:
                     st.error("Unkown Use Case")
                     return
@@ -62,6 +64,7 @@ class PdfProcessorPipeline(LLMPipeline):
                 
                 try:
                     final_solution = parser.process({"paths": paths})
+                    print(final_solution)
                     st.session_state[file_type + "_results"] = final_solution
                     st.session_state[file_type + "_text"] = json.dumps(
                         final_solution.model_dump(), indent=2, ensure_ascii=False

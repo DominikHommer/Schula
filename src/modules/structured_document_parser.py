@@ -63,54 +63,92 @@ class StructuredDocumentParser:
             )
 
     # --- 2. Internal Method for Simple Transcription (Ollama option added) ---
+
     def _process_transcription(self, paths: list[str]) -> StudentText:
-        full_text = []
+        """
+        Transcribe each image in `paths` into a list of lines.
+        Returns a StudentText model containing all lines from all pages.
+        """
+        # Wir sammeln hier Dikt-Einträge für Pydantic
+        all_lines_data: list[dict] = []
+
         system_prompt = (
-            "You are an expert OCR and transcription engine. Your only task is to "
-            "extract all text from the provided image, exactly as you see it. "
+            "You are an expert OCR and transcription engine. "
+            "Extract all text from the provided image **line by line**. "
             "Respond with a JSON object conforming to the `StudentText` schema, "
-            "which has a single key: 'raw_text'."
+            "which has exactly one key: `lines`. "
+            "`lines` is a list of objects, each with a single field:\n"
+            "  - `text` (string): the exact text of that line\n"
+            "Ignore any red teacher markup, corrections, strikethroughs or other annotations."
         )
-        
+
         for i, path in enumerate(paths):
             if self.callback:
                 self.callback(i + 1, len(paths))
             print(f"[Parser] Transcribing page {i+1}/{len(paths)}...")
 
+            # Bild laden & Base64
             with open(path, "rb") as img_file:
-                b64 = base64.b64encode(img_file.read()).decode("utf-8")
-            
+                img_b64 = base64.b64encode(img_file.read()).decode("utf-8")
+
             try:
                 # --- GROQ API CALL ---
                 if self.llm_provider == "groq":
-                    messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": [{"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}}]}]
+                    messages = [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": [
+                            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{img_b64}"}}  
+                        ]}
+                    ]
                     completion = self.client.chat.completions.create(
-                        model=self.model_name, messages=messages, temperature=0.0,
-                        response_format={"type": "json_object", "schema": StudentText.model_json_schema()},
+                        model=self.model_name,
+                        messages=messages,
+                        temperature=0.0,
+                        response_format={
+                            "type": "json_object",
+                            "schema": StudentText.model_json_schema()
+                        }
                     )
                     raw = completion.choices[0].message.content
-                
-                # --- OLLAMA / LANGCHAIN (for local models like Gemma 2) ---
-                # elif self.llm_provider == "ollama":
-                #     from langchain_core.messages import HumanMessage, SystemMessage
-                #     lc_messages = [
-                #         SystemMessage(content=system_prompt),
-                #         HumanMessage(content=[{"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}}])
-                #     ]
-                #     # .invoke() returns a message object; its content is the raw JSON string
-                #     completion = self.client.invoke(lc_messages) 
-                #     raw = completion.content
 
-                parsed_data = json.loads(raw)
-                page_text = StudentText(**parsed_data).raw_text
-                if page_text:
-                    full_text.append(page_text)
+                # --- OLLAMA / LANGCHAIN fallback ---
+                elif self.llm_provider == "ollama":
+                    from langchain_core.messages import SystemMessage, HumanMessage
+                    lc_messages = [
+                        SystemMessage(content=system_prompt),
+                        HumanMessage(content=[
+                            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{img_b64}"}}  
+                        ])
+                    ]
+                    completion = self.client.invoke(lc_messages)
+                    raw = completion.content
+
+                else:
+                    raise ValueError(f"Unsupported LLM provider: {self.llm_provider}")
+
+                # 1) JSON parsen
+                parsed_json = json.loads(raw)
+                raw_lines = parsed_json.get("lines", [])
+
+                # 2) Normalisieren: Strings → dicts
+                for item in raw_lines:
+                    if isinstance(item, str):
+                        all_lines_data.append({"text": item})
+                    elif isinstance(item, dict) and "text" in item:
+                        all_lines_data.append(item)
+                    else:
+                        # Unerwartetes, überspringen oder loggen
+                        print(f"[Parser] WARNUNG: Ungültiges lines-Item, skipping: {item!r}")
+                        continue
+
             except Exception as e:
-                print(f"[Parser] WARNUNG: Could not transcribe page {i+1}. Error: {e}")
+                print(f"[Parser] WARNUNG: Seite {i+1} konnte nicht transkribiert werden: {e}")
                 continue
-        
-        final_transcription = "\n\n---\n\n".join(full_text)
-        return StudentText(raw_text=final_transcription)
+
+        # 3) Am Ende erstellen wir das Pydantic-Objekt aus den dicts
+        return StudentText(lines=all_lines_data)
+
+
 
 
     # --- 3. Internal Method for Structured Solution Extraction (Ollama option added) ---

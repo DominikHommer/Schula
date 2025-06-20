@@ -17,7 +17,7 @@ class LanguageClient():
     
     # model = cached_initialize_model()
     # "deepseek-r1:70b"
-    def __init__(self, model: str="deepseek-r1:70b"):
+    def __init__(self, model: str="gemma3:27b"):
         self.model = ChatOllama(model=model)
 
         # REMOVE IF GROQ NOT USED

@@ -9,6 +9,7 @@ from pipelines.pdf_processor import PdfProcessorPipeline
 from pipelines.llm_extractor import LLMTextExtractorPipeline
 from pipelines.student_exam_extractor import StudentExamProcessorPipeline
 from models.parser.extraction_result import ExtractionResult
+from models.parser.student_text import StudentText
 
 llmClient = LanguageClient()
 _studenExamProcessorPipeline = StudentExamProcessorPipeline()
@@ -154,15 +155,18 @@ def run():
             
             if 'student_results' in st.session_state and st.session_state.student_results:
                 try:
-                    result = st.session_state.student_results
-                    
-                    full_text = result.raw_text
-                    
-                    st.markdown(full_text) 
+                    result: StudentText = st.session_state.student_results
+                    annotated = [
+                        f"{line.text}"
+                        for idx, line in enumerate(result.lines, start=1)
+                    ]
+                    full_text = "\n".join(annotated)
+
+                    st.markdown(full_text)
                     
                 except Exception as e:
                     st.error(f"Fehler bei der Anzeige des Schülertextes: {e}")
-                    st.json(st.session_state.student_text) 
+                    st.json(st.session_state.student_text)
             else:
                 st.warning("Kein Schülertext zur Anzeige vorhanden.")
 

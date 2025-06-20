@@ -3,7 +3,7 @@ from typing import List
 
 class SubAspect(BaseModel):
     Aspekt: str = Field(..., description="Der Aspekt der Teilaufgabe, z.B. eine geforderte Definition.")
-    Beleg_Schüleraufsatz: str = Field(..., description="Der Beleg für den in der Teilaufgabe der Muterlösung geforderten Aspekt aus dem Schüleraufsatz.")
+    Beleg_Schüleraufsatz: str = Field(..., description="Der Beleg für den in der Teilaufgabe der Muterlösung geforderten Aspekt aus dem Schüleraufsatz inklusive der Zeile(n) nummer(n) in eckigen Klammern.")
     Beleg_Musterlösung: str = Field(..., description="Der Teil aus der Musterlösung, wo die Anforderungen für den Aspekt aufgeschlüsselt sind.")
     Kommentar: str = Field(..., description="Weitere Anmerkungen zur Bearbeitung des Schülers. Z.B. wurde der Aspekt nur teils bearbeitet oder in einer anderen Aufgabe durch den Schüler bearbeitet.")
 
