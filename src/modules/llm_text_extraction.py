@@ -134,8 +134,8 @@ Diskrepanz: Wenn Realselbst und Ideal-Selbst nicht übereinstimmen.
                 model="meta-llama/llama-4-scout-17b-16e-instruct",
                 messages=messages,
                 response_model=ExtractionResult,
-                temperature=1.0,
-                max_completion_tokens=3000,
+                temperature=0,
+                seed=42,
             )
             return result
 

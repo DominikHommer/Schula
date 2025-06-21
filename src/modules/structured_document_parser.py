@@ -1,21 +1,11 @@
-import os
 import time
 import json
 import base64
-from pathlib import Path
-from groq import Groq
 from typing import Type
-from dotenv import load_dotenv
-from pdf2image import convert_from_path
 from pydantic import BaseModel
-from langchain_ollama import ChatOllama
-from langchain_groq import ChatGroq
-from langchain_core.messages import SystemMessage, HumanMessage
 from models.parser.model_solution import PageExtraction, ModelSolution, TaskSolution
 from models.parser.student_text import StudentText
 from typing import List, Optional
-
-from .module_base import Module
 
 class StructuredDocumentParser:
     # --- Handles different LLM providers ---
@@ -104,6 +94,7 @@ class StructuredDocumentParser:
                         model=self.model_name,
                         messages=messages,
                         temperature=0.0,
+                        seed=42,
                         response_format={
                             "type": "json_object",
                             "schema": StudentText.model_json_schema()
@@ -167,10 +158,22 @@ class StructuredDocumentParser:
                 try:
                     # --- GROQ API CALL ---
                     if self.llm_provider == "groq":
-                        messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": [{"type": "text", "text": "Bitte extrahiere die Aufgaben..."}, {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}}]}]
+                        messages = [
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": [
+                                {"type": "text", "text": "Bitte transkribiere und extrahiere danach die Aufgaben..."}, 
+                                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}}
+                            ]}
+                        ]
                         completion = self.client.chat.completions.create(
-                            model=self.model_name, messages=messages, temperature=0.1,
-                            max_completion_tokens=4096, response_format={"type": "json_object", "schema": PageExtraction.model_json_schema()},
+                            model=self.model_name,
+                            messages=messages,
+                            temperature=0,
+                            seed=42,
+                            response_format={
+                                "type": "json_object", 
+                                "schema": PageExtraction.model_json_schema()
+                            },
                         )
                         raw = completion.choices[0].message.content
                     
