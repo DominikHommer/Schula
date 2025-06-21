@@ -135,7 +135,8 @@ Diskrepanz: Wenn Realselbst und Ideal-Selbst nicht übereinstimmen.
             return self.language_client.get_response(
                 messages=messages,
                 schema=ExtractionResult,
-                temperature=1.0
+                temperature=0.0,
+                seed = 42
             )
 
         except ValidationError as ve:

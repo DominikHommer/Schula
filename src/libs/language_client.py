@@ -18,7 +18,7 @@ class LanguageClient:
             mode=instructor.Mode.JSON
         )
 
-    def get_response(self, messages: list[dict], schema: type[BaseModel], temperature : float ) -> BaseModel:
+    def get_response(self, messages: list[dict], schema: type[BaseModel], temperature : float, seed : int = 42) -> BaseModel:
         """
         Führt die Modellabfrage mit Instructor und strukturierter Antwortvalidierung durch.
         """
@@ -27,6 +27,6 @@ class LanguageClient:
             messages=messages,
             response_model=schema,
             temperature=temperature,
-            max_completion_tokens=3000
+            seed=seed
         )
 
