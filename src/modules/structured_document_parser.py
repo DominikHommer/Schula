@@ -18,7 +18,7 @@ class StructuredDocumentParser:
         self.output_path = "debug_output.txt"
         self.client = llm_client
 
-    # --- 1. The Main Dispatcher Method (Unchanged) ---
+    # --- 1. The Main Dispatcher Method ---
     def process(self, data: dict) -> BaseModel:
         paths: list[str] = data.get("paths")
         if not paths:
@@ -35,7 +35,7 @@ class StructuredDocumentParser:
                 f"Processing for schema '{self.schema_model.__name__}' is not implemented."
             )
 
-    # --- 2. Internal Method for Simple Transcription (Ollama option added) ---
+    # --- 2. Internal Method for Simple Transcription ---
 
     def _process_transcription(self, paths: list[str]) -> StudentText:
         """
@@ -90,7 +90,7 @@ class StructuredDocumentParser:
 
 
 
-    # --- 3. Internal Method for Structured Solution Extraction (Ollama option added) ---
+    # --- 3. Internal Method for Structured Solution Extraction ---
     def _process_structured_solution(self, paths: list[str]) -> ModelSolution:
         page_results: List[PageExtraction] = []
         context_for_next_page: Optional[str] = None
@@ -135,9 +135,8 @@ class StructuredDocumentParser:
         print("[Parser] Zusammenführung abgeschlossen.")
         return final_result
 
-    # --- 4. Helper Methods for Structured Solution Extraction (Unchanged) ---
+    # --- 4. Helper Methods for Structured Solution Extraction ---
     def _build_prompt_for_page(self, context_from_previous_page: Optional[str]) -> str:
-        # ... (This method is correct and remains unchanged) ...
         schema_json = json.dumps(PageExtraction.model_json_schema(), indent=2)
         prompt = (f"{self.system_prompt_template}\n\n...--- REQUIRED JSON SCHEMA ---\n{schema_json}\n--- END OF SCHEMA ---\n")
         if context_from_previous_page:
@@ -147,7 +146,6 @@ class StructuredDocumentParser:
         return prompt
 
     def _merge_results(self, page_results: List[PageExtraction]) -> ModelSolution:
-        # ... (This method is correct and remains unchanged) ...
         if not page_results: return ModelSolution(solutions=[])
         final_tasks: List[TaskSolution] = []
         for page_data in page_results:
