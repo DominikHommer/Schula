@@ -1,6 +1,5 @@
 import json
 import os
-import sys
 import streamlit as st
 
 from .llm_pipeline import LLMPipeline
@@ -10,6 +9,9 @@ from models.parser.model_solution import ModelSolution  # musterlösung/erwartun
 from models.parser.schulbuch_seite import SchulbuchSeite # Schulbuch not needed yet
 from models.parser.student_text import StudentText 
 from modules.structured_document_parser import StructuredDocumentParser
+from libs.language_client import LanguageClient
+
+client = LanguageClient()
 
 class PdfProcessorPipeline(LLMPipeline):
     """
@@ -60,7 +62,7 @@ class PdfProcessorPipeline(LLMPipeline):
                     st.error("Unkown Use Case")
                     return
                 
-                parser = StructuredDocumentParser(schema_model=schema, prompt=prompt, debug=False, callback = update_progress)
+                parser = StructuredDocumentParser(schema_model=schema, prompt=prompt, debug=False, llm_client=client, callback = update_progress)
                 
                 try:
                     final_solution = parser.process({"paths": paths})

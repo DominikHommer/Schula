@@ -1,49 +1,22 @@
-import os
 import time
 import json
 import base64
-from pathlib import Path
-from groq import Groq
 from typing import Type
-from dotenv import load_dotenv
-from pdf2image import convert_from_path
 from pydantic import BaseModel
-from langchain_ollama import ChatOllama
-from langchain_groq import ChatGroq
-from langchain_core.messages import SystemMessage, HumanMessage
 from models.parser.model_solution import PageExtraction, ModelSolution, TaskSolution
 from models.parser.student_text import StudentText
 from typing import List, Optional
-
-from .module_base import Module
+from libs.language_client import LanguageClient
 
 class StructuredDocumentParser:
     # --- Handles different LLM providers ---
-    def __init__(self, schema_model: Type[BaseModel], prompt: str, 
-                 llm_provider: str = "groq", 
-                 model_name: str = "meta-llama/llama-4-scout-17b-16e-instruct",
-                 debug: bool = False, callback=None):
-        
-        self.llm_provider = llm_provider
-        self.model_name = model_name
-        self.client = None
-
-        if self.llm_provider == "groq":
-            from groq import Groq
-            self.client = Groq()
-        elif self.llm_provider == "ollama":
-            # For local models via Ollama and LangChain
-            from langchain_community.chat_models import ChatOllama
-            # The ChatOllama client is initialized here. 'format="json"' enables JSON mode.
-            self.client = ChatOllama(model=self.model_name, format="json", temperature=0.2)
-        else:
-            raise ValueError(f"Unsupported LLM provider: {self.llm_provider}")
-
+    def __init__(self, schema_model: Type[BaseModel], prompt: str, llm_client: LanguageClient,debug: bool = False, callback=None):
         self.schema_model = schema_model
         self.system_prompt_template = prompt
         self.debug = debug
         self.callback = callback
         self.output_path = "debug_output.txt"
+        self.client = llm_client
 
     # --- 1. The Main Dispatcher Method (Unchanged) ---
     def process(self, data: dict) -> BaseModel:
@@ -92,54 +65,20 @@ class StructuredDocumentParser:
                 img_b64 = base64.b64encode(img_file.read()).decode("utf-8")
 
             try:
-                # --- GROQ API CALL ---
-                if self.llm_provider == "groq":
-                    messages = [
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": [
-                            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{img_b64}"}}  
-                        ]}
-                    ]
-                    completion = self.client.chat.completions.create(
-                        model=self.model_name,
-                        messages=messages,
-                        temperature=0.0,
-                        response_format={
-                            "type": "json_object",
-                            "schema": StudentText.model_json_schema()
-                        }
-                    )
-                    raw = completion.choices[0].message.content
+                messages = [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": [
+                        {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{img_b64}"}}
+                    ]}
+                ]
 
-                # --- OLLAMA / LANGCHAIN fallback ---
-                elif self.llm_provider == "ollama":
-                    from langchain_core.messages import SystemMessage, HumanMessage
-                    lc_messages = [
-                        SystemMessage(content=system_prompt),
-                        HumanMessage(content=[
-                            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{img_b64}"}}  
-                        ])
-                    ]
-                    completion = self.client.invoke(lc_messages)
-                    raw = completion.content
-
-                else:
-                    raise ValueError(f"Unsupported LLM provider: {self.llm_provider}")
-
-                # 1) JSON parsen
-                parsed_json = json.loads(raw)
-                raw_lines = parsed_json.get("lines", [])
-
-                # 2) Normalisieren: Strings → dicts
-                for item in raw_lines:
-                    if isinstance(item, str):
-                        all_lines_data.append({"text": item})
-                    elif isinstance(item, dict) and "text" in item:
-                        all_lines_data.append(item)
-                    else:
-                        # Unerwartetes, überspringen oder loggen
-                        print(f"[Parser] WARNUNG: Ungültiges lines-Item, skipping: {item!r}")
-                        continue
+                response = self.client.get_response(
+                    messages=messages,
+                    schema=StudentText,
+                    temperature=0.2
+                )
+                for item in response.lines:
+                    all_lines_data.append({"text": item.text})
 
             except Exception as e:
                 print(f"[Parser] WARNUNG: Seite {i+1} konnte nicht transkribiert werden: {e}")
@@ -162,32 +101,24 @@ class StructuredDocumentParser:
             system_prompt = self._build_prompt_for_page(context_for_next_page)
             with open(path, "rb") as img_file: b64 = base64.b64encode(img_file.read()).decode("utf-8")
             
+            messages = [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": [
+                    {"type": "text", "text": "Bitte extrahiere die Aufgaben..."},
+                    {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}}
+                ]}
+            ]
+
             parsed_page: Optional[PageExtraction] = None
             for attempt in range(1, 4):
                 try:
                     # --- GROQ API CALL ---
-                    if self.llm_provider == "groq":
-                        messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": [{"type": "text", "text": "Bitte extrahiere die Aufgaben..."}, {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}}]}]
-                        completion = self.client.chat.completions.create(
-                            model=self.model_name, messages=messages, temperature=0.1,
-                            max_completion_tokens=4096, response_format={"type": "json_object", "schema": PageExtraction.model_json_schema()},
-                        )
-                        raw = completion.choices[0].message.content
-                    
-                    # --- OLLAMA / LANGCHAIN (for local models like Gemma 2) ---
-                    # elif self.llm_provider == "ollama":
-                    #     from langchain_core.messages import HumanMessage, SystemMessage
-                    #     lc_messages = [
-                    #         SystemMessage(content=system_prompt),
-                    #         HumanMessage(content=[
-                    #             {"type": "text", "text": "Bitte extrahiere die Aufgaben..."},
-                    #             {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}}
-                    #         ])
-                    #     ]
-                    #     completion = self.client.invoke(lc_messages)
-                    #     raw = completion.content
-
-                    parsed_page = PageExtraction(**json.loads(raw))
+                    response = self.client.get_response(
+                        messages=messages,
+                        schema=PageExtraction,
+                        temperature=0.2
+                    )
+                    parsed_page = response
                     break
                 except Exception as e:
                     print(f"[Parser] Fehler bei Seite {i+1} (Versuch {attempt}): {e}")

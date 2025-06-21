@@ -3,6 +3,7 @@ import json
 from pydantic import ValidationError
 from models.parser.extraction_result import ExtractionResult
 from .llm_module_base import LLMModule
+from libs.language_client import LanguageClient
 
 # instructor + Groq
 import instructor
@@ -14,9 +15,10 @@ class LLMExtraction(LLMModule):
     Jetzt über Instructor API mit Groq.
     """
 
-    def __init__(self, debug=False, debug_folder="debug/debug_llm_extraction"):
+    def __init__(self, language_client: LanguageClient, debug=False, debug_folder="debug/debug_llm_extraction"):
         super().__init__("llm_extraction")
         self.schema_json = ExtractionResult.model_json_schema()
+        self.language_client = language_client
         self.debug = debug
         self.debug_folder = debug_folder
         if self.debug:
@@ -130,14 +132,11 @@ Diskrepanz: Wenn Realselbst und Ideal-Selbst nicht übereinstimmen.
                         ]
 
         try:
-            result = self.client.chat.completions.create(
-                model="meta-llama/llama-4-scout-17b-16e-instruct",
+            return self.language_client.get_response(
                 messages=messages,
-                response_model=ExtractionResult,
-                temperature=1.0,
-                max_completion_tokens=3000,
+                schema=ExtractionResult,
+                temperature=1.0
             )
-            return result
 
         except ValidationError as ve:
             print("JSON konnte nicht validiert werden:", ve)

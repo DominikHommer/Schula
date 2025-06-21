@@ -1,14 +1,11 @@
 import json
 import pandas as pd
 import streamlit as st
-from pdf2image import convert_from_bytes
-from langchain_core.messages import AIMessage, HumanMessage
 
 from libs.language_client import LanguageClient
 from pipelines.pdf_processor import PdfProcessorPipeline
 from pipelines.llm_extractor import LLMTextExtractorPipeline
 from pipelines.student_exam_extractor import StudentExamProcessorPipeline
-from models.parser.extraction_result import ExtractionResult
 from models.parser.student_text import StudentText
 
 llmClient = LanguageClient()

@@ -42,7 +42,7 @@ class LLMTextExtractorPipeline(LLMPipeline):
     def __init__(self, llmClient: LanguageClient, input_data: dict | None = None):
         super().__init__(llmClient, input_data)
 
-        self.add_stage(LLMExtraction(debug=False))
+        self.add_stage(LLMExtraction(language_client=llmClient, debug=False))
 
     def process_solutions(self, model_solution: ModelSolution, student_solution: StudentText) -> Dict[str, any]:
         """
