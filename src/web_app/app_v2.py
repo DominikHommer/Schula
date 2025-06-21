@@ -188,16 +188,24 @@ def run():
             if st.button(label="Schülerklausur", help="Setzt die extrahierte Schülerklausur zurück und ermöglicht das Hochladen neuer Dateien."):
                 st.session_state.step = 2
                 st.session_state.student_files = None
-                st.session_state['student_started'] = False
+                st.session_state.student_results = None
+                st.session_state.student_file_processed = False
+                st.session_state.student_started = False
                 st.session_state.extraction_text = None
                 st.rerun()
             # solution text
             if st.button(label="Schülerklausur und Musterlösung", help="Setzt die extrahierte Schülerklausur und Musterlösung zurück und ermöglicht das Hochladen neuer Dateien."):
                 st.session_state.step = 1
                 st.session_state.student_files = None
+                st.session_state.student_results = None
+                st.session_state.student_file_processed = False
+                
                 st.session_state.solution_files = None
-                st.session_state['student_started'] = False
-                st.session_state['solution_started'] = False
+                st.session_state.solution_results = None
+                st.session_state.solution_file_processed = False
+
+                st.session_state.student_started = False
+                st.session_state.solution_started = False
                 st.session_state.extraction_text = None
                 st.rerun()
                     
