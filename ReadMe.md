@@ -1,6 +1,6 @@
 # Schula
 
-**Schula** ist eine Anwendung zur Analyse und Bewertung von Schülerantworten basierend auf einer Musterlösung (Erwartungshorizont). Es verwendet Language Models (LLMs), um Textsegmente von Schülerantworten den entsprechenden Punkten der Musterlösung zuzuordnen.
+**Schula** ist ein modulares Framework zur Analyse und Bewertung von Schülerantworten basierend auf einer Musterlösung (Erwartungshorizont). Es verwendet Language Models (LLMs), um Textsegmente von Schülerantworten den entsprechenden Punkten der Musterlösung zuzuordnen.
 
 ## Features
 
@@ -83,7 +83,6 @@ schula/
 
 Die Architektur von **Schula** folgt einem modularen, gekapselten Aufbau, der stark auf einen klar definierten LLM-Lifecycle setzt. Jede Einheit der Verarbeitung (ob CV oder LLM) kapselt ihre eigenen Schritte und kommuniziert nur über definierte Schnittstellen:
 
-* **CV-Pipeline**: Verantwortlich für alle bildverarbeitenden Schritte – von der PDF-Zerlegung über Segmentierung bis zur OCR. Ergebnis sind strukturierte Texteinheiten.
 * **CV-Pipeline**: Verantwortlich für alle bildverarbeitenden Schritte – von der PDF-Zerlegung über Segmentierung bis zur OCR. Ergebnis sind strukturierte Texteinheiten.
 * **LLMClient** (in `libs/`): Vermittelt zwischen LLMs und Modulen
 
@@ -185,4 +184,15 @@ python -m unittest
 
 ## Lizenz
 
-MIT License
+Dieses Projekt steht unter der GNU General Public License v3.0.
+
+**Autoren:** Dominik Hommer, Benedikt Veith, Edmond Skender, Bastian Schwarz, Nils Poethkow
+
+Copyright (C) 2025 Dominik Hommer, Benedikt Veith, Edmond Skender, Bastian Schwarz, Nils Poethkow
+
+Dieses Programm ist freie Software: Sie können es unter den Bedingungen der GNU General Public License, wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren – entweder gemäß Version 3 der Lizenz oder (nach Ihrer Wahl) jeder späteren Version.
+
+Dieses Programm wird in der Hoffnung verbreitet, dass es nützlich sein wird, aber OHNE JEDE GEWÄHRLEISTUNG – sogar ohne die implizite Gewährleistung der MARKTFÄHIGKEIT oder EIGNUNG FÜR EINEN BESTIMMTEN ZWECK. Siehe die GNU General Public License für weitere Details.
+
+Sie sollten eine Kopie der GNU General Public License zusammen mit diesem Programm erhalten haben. Wenn nicht, siehe [https://www.gnu.org/licenses/](https://www.gnu.org/licenses/).
+
