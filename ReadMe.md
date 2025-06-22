@@ -179,10 +179,9 @@ Bitte wenden Sie sich für Daten an einen der genannten Autoren
 * Jedes Modul sollte durch Unit-Tests abgedeckt sein
 * Pipelines sollten sinnvoll getestet werden
 * Tests befinden sich im Ordner `tests`, Mockdaten unter `tests/fixtures`
-* Tests ausführen mit:
+* Tests ausführen mit (in root Ordner):
 
 ```bash
-cd src
 python -m unittest
 ```
 

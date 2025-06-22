@@ -18,13 +18,19 @@ def normalize_paths(paths):
     """
     Normalizes file paths by converting pdfs into singular files
     """
+    cwd = os.getcwd()
+    
+    _prependum = ''
+    if os.path.basename(cwd) == "src":
+        _prependum = '..'
+
     path_inputs = []
     for p_i, _input in enumerate(paths):
         if is_pdf(_input):
             images = convert_from_path(_input)
         
             for i, img in enumerate(images):
-                path = os.path.join("data", "local", f"image_{p_i}_{i}.png")
+                path = os.path.join(_prependum, "data", "local", f"image_{p_i}_{i}.png")
                 img.save(path)
                 path_inputs.append(path)
         else:

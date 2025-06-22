@@ -162,7 +162,7 @@ class TextCorrector(Module):
         words = (re.sub(r'([.,!?;:()\[\]{}"“”])', r' \1 ', text)).split()
 
         corrected_words = []
-        for i in enumerate(words):
+        for i, _ in enumerate(words):
             original_word = words[i]
 
             # Add line breaks to their original position

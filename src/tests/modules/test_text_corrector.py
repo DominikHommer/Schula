@@ -23,7 +23,7 @@ class TestTextCorrector(unittest.TestCase):
         corrector.fill_mask = MagicMock(return_value=[{"token_str": "selbstbewusst"}])
         corrector.score_candidates_batch = MagicMock(return_value={"selbstbewusst": 0.9})
 
-        data = {"text-recognizer": ["s3lbstbewust"]}
+        data = {"text-recognizer": ["ich bin so s3lbstbewust"]}
 
         result = corrector.process(data)
 
