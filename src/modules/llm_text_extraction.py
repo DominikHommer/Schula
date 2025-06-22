@@ -1,13 +1,14 @@
 import os
 import json
-from pydantic import ValidationError
-from models.parser.extraction_result import ExtractionResult
-from .llm_module_base import LLMModule
-from libs.language_client import LanguageClient
 
 # instructor + Groq
 import instructor
 from groq import Groq
+
+from pydantic import ValidationError
+from models.parser.extraction_result import ExtractionResult
+from libs.language_client import LanguageClient
+from .llm_module_base import LLMModule
 
 class LLMExtraction(LLMModule):
     """
@@ -152,4 +153,3 @@ Diskrepanz: Wenn Realselbst und Ideal-Selbst nicht übereinstimmen.
                 with open(os.path.join(self.debug_folder, "llm_response_failed.txt"), "w", encoding="utf-8") as f:
                     f.write(str(e))
             raise e
-

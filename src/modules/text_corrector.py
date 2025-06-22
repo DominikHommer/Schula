@@ -1,6 +1,7 @@
 import os
 import re
 import torch
+import torch.nn.functional as F
 from spellchecker import SpellChecker
 from transformers import (
     DistilBertTokenizerFast,
@@ -8,7 +9,6 @@ from transformers import (
     pipeline
 )
 from Levenshtein import ratio, distance
-import torch.nn.functional as F
 from spylls.hunspell import Dictionary
 from jarowinkler import jarowinkler_similarity
 from symspellpy import SymSpell, Verbosity

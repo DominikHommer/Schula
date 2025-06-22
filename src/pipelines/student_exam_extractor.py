@@ -10,9 +10,9 @@ from modules.text_recognizer import TextRecognizer
 from modules.text_corrector import TextCorrector
 from libs.file_helper import save_temp_file, normalize_paths
 
-from .cv_pipeline import CVPipeline
-
 from models.parser.student_text import StudentText
+
+from .cv_pipeline import CVPipeline
 
 class StudentExamProcessorPipeline(CVPipeline):
     """

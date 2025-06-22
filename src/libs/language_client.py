@@ -29,4 +29,3 @@ class LanguageClient:
             temperature=temperature,
             seed=seed
         )
-

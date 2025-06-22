@@ -137,8 +137,8 @@ class HorizontalCutterLineDetect(Module):
 
         (h, w) = gray.shape[:2]
         center = (w // 2, h // 2)
-        M = cv2.getRotationMatrix2D(center, median_angle, 1.0)
-        rotated = cv2.warpAffine(gray, M, (w, h),
+        _m = cv2.getRotationMatrix2D(center, median_angle, 1.0)
+        rotated = cv2.warpAffine(gray, _m, (w, h),
                                 flags=cv2.INTER_CUBIC,
                                 borderMode=cv2.BORDER_REPLICATE)
         

@@ -36,20 +36,26 @@ def app_session_init():
 
 
 def show_progress():
+    """
+    Update progess bar
+    """
     st.markdown(
         f"<div style='text-align:center; font-size:1.5rem;'>{PROGRESS_STEPS[st.session_state.step]}</div>",
         unsafe_allow_html=True,
     )
 
 def run():
+    """
+    Streamlit's main
+    """
     st.set_page_config(page_title="Helferlein", layout="wide")
     app_session_init()
     # Persistenter Header
     st.markdown("<h1 style='text-align:center;'>Helferlein</h1>", unsafe_allow_html=True)
     st.divider()
 
-    def _set_file_started(type: str):
-        st.session_state[type + '_started'] = True
+    def _set_file_started(_type: str):
+        st.session_state[_type + '_started'] = True
 
     _allowed_types = ["pdf", "jpg", "jpeg", "png"]
     # Schritt 1: Musterlösung hochladen
@@ -168,11 +174,11 @@ def run():
                 st.warning("Kein Schülertext zur Anzeige vorhanden.")
 
         if st.button("Extrahieren", type="primary"):
-                responses = LLMTextExtractorPipeline(llmClient).process_solutions(st.session_state.solution_results, st.session_state.student_results)
-                st.session_state.extraction_started = True
-                st.session_state.extraction_text = responses
-                st.session_state.step = 4
-                st.rerun()
+            responses = LLMTextExtractorPipeline(llmClient).process_solutions(st.session_state.solution_results)
+            st.session_state.extraction_started = True
+            st.session_state.extraction_text = responses
+            st.session_state.step = 4
+            st.rerun()
             
     elif st.session_state.step == 4:
         st.subheader("Auswertung der Schülerantworten")

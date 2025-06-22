@@ -4,6 +4,9 @@ import fleep
 from pdf2image import convert_from_path
 
 def is_pdf(file_path) -> bool:
+    """
+    Check if file is a pdf
+    """
     with open(file_path, "rb") as file:
         info = fleep.get(file.read(128))
 
@@ -12,6 +15,9 @@ def is_pdf(file_path) -> bool:
     return False
 
 def normalize_paths(paths):
+    """
+    Normalizes file paths by converting pdfs into singular files
+    """
     path_inputs = []
     for p_i, _input in enumerate(paths):
         if is_pdf(_input):

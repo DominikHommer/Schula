@@ -2,14 +2,15 @@ import json
 import os
 import streamlit as st
 
-from .llm_pipeline import LLMPipeline
 from libs.file_helper import save_temp_file, normalize_paths
+from libs.language_client import LanguageClient
 from models.parser.assignment_sheet import AssignmentSheet  # aufgabenblatt
 from models.parser.model_solution import ModelSolution  # musterlösung/erwartungshorizont
 from models.parser.schulbuch_seite import SchulbuchSeite # Schulbuch not needed yet
 from models.parser.student_text import StudentText 
 from modules.structured_document_parser import StructuredDocumentParser
-from libs.language_client import LanguageClient
+
+from .llm_pipeline import LLMPipeline
 
 client = LanguageClient()
 
@@ -22,6 +23,9 @@ class PdfProcessorPipeline(LLMPipeline):
         super().__init__(input_data)
 
     def process_streamlit(self, uploaded_files, file_type):
+        """
+        Execute pipeline in streamlit context
+        """
         attribute_processed = f"{file_type}_file_processed"
 
         paths = []

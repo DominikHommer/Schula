@@ -1,14 +1,17 @@
+from typing import Dict
+import streamlit as st
+
 from modules.llm_text_extraction import LLMExtraction
 from libs.language_client import LanguageClient
+from models.parser.model_solution import ModelSolution
+from models.parser.student_text import StudentText
 
 from .llm_pipeline import LLMPipeline
 
-from typing import Dict
-from models.parser.model_solution import ModelSolution
-from models.parser.student_text import StudentText
-import streamlit as st
-
 def update_progress(current_page: int, total_pages: int, progress_bar, status):
+    """
+    Update page progress
+    """
     progress_bar.progress(current_page / total_pages)
     status.text(f"Verarbeite Seite {current_page} von {total_pages}")
 
@@ -44,7 +47,7 @@ class LLMTextExtractorPipeline(LLMPipeline):
 
         self.add_stage(LLMExtraction(language_client=llmClient, debug=False))
 
-    def process_solutions(self, model_solution: ModelSolution, student_solution: StudentText) -> Dict[str, any]:
+    def process_solutions(self, model_solution: ModelSolution) -> Dict[str, any]:
         """
         Processes model and student solutions to generate LLM prompts.
         """
