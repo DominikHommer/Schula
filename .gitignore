@@ -1,6 +1,13 @@
 debug/
-data/input/*
+data/input/**
+data/output/**
+school_books/**.txt
+eval/**.txt
+tests/fixtures/**
+
+!tests/fixtures/**.py
 !data/input/image.png
+
 
 .DS_Store
 # Byte-compiled / optimized / DLL files

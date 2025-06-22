@@ -161,6 +161,10 @@ Die Architektur von **Schula** folgt einem modularen, gekapselten Aufbau, der st
   * `ultralytics==8.3.115`
   * `tensorflow==2.19.0`
 
+## Daten
+
+Bitte wenden Sie sich für Daten an einen der genannten Autoren
+
 ## Linting & Tests
 
 ### Linting
