@@ -54,7 +54,7 @@ class LLMExtraction(LLMModule):
         {self.schema_json}
         """
 
-    def process(self, data: dict) -> ExtractionResult:
+    def process(self, data: dict, _ = None) -> ExtractionResult:
         """
         Führt die Extraktion via Instructor-Groq durch und validiert gegen das ExtractionResult-Modell.
         """

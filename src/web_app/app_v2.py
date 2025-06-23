@@ -1,7 +1,9 @@
 import json
 import pandas as pd
 import streamlit as st
+from dotenv import load_dotenv
 
+load_dotenv()
 from libs.language_client import LanguageClient
 from pipelines.pdf_processor import PdfProcessorPipeline
 from pipelines.llm_extractor import LLMTextExtractorPipeline
