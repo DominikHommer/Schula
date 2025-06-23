@@ -29,6 +29,8 @@ class TestLineCropper(unittest.TestCase):
             h, w = cropped.shape[:2]
             self.assertGreater(h, 0)
             self.assertGreater(w, 0)
+            self.assertNotEqual(cropped.shape[0], image.shape[0])  # ungleiche Höhe
+            self.assertNotEqual(cropped.shape[1], image.shape[1])  # ungleiche Breite
 
     def test_debug_images_created(self):
         self.line_cropper = LineCropper(debug=True)

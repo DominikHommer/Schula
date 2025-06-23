@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 from modules.red_remover import RedRemover
 
-test_image_path = os.path.join("tests", "fixtures", "test_image.png")
+test_image_path = os.path.join("tests", "fixtures", "test_redremover.png")
 result_image_path = os.path.join("tests", "fixtures", "result_redremover.png")
 RedRemoverInstance = RedRemover()
 

@@ -303,6 +303,11 @@ class TextCorrector(Module):
                     final_scores[w] = score
                     #print(lev, w, s * lm_weight, similarity, f'Final: {final_scores[w]}')
                 
+                if len(final_scores.values()) == 0:
+                    corrected_words.append(original_word)
+
+                    continue
+                    
                 best = max(final_scores, key=lambda w: final_scores[w])
                 if distance(original_word, best) > 4:
                     corrected_words.append(original_word)

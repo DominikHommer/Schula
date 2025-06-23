@@ -12,6 +12,7 @@ from libs.file_helper import normalize_paths
 from models.parser.assignment_sheet import AssignmentSheet
 from models.parser.model_solution import ModelSolution
 from models.parser.schulbuch_seite import SchulbuchSeite
+from models.parser.student_text import StudentText
 
 load_dotenv()
 llmClient = LanguageClient()
@@ -44,6 +45,25 @@ class TestStructuredDocumentParser(unittest.TestCase):
         self.assertIsNotNone(result.solutions)
         self.assertIsNotNone(result.solutions[0].subsolutions)
         self.assertIsNotNone(result.solutions[0].subsolutions[0].solution)
+    
+    def test_student_solution_parsing(self):
+        parser = StructuredDocumentParser(
+            schema_model=StudentText,
+            prompt="Bitte analysiere die Schulaufgabe und gib eine strukturierte JSON-Darstellung zurück.",
+            llm_client=llmClient,
+            debug=False
+        )
+
+        path = os.path.abspath("tests/fixtures/test_image_cut.png")
+        paths = normalize_paths([path])
+
+        result = parser.process({"paths": paths})
+        
+        self.assertIsInstance(result, StudentText)
+        self.assertIsNotNone(result.lines)
+        self.assertIsNotNone(result.lines[0])
+        self.assertIsNotNone(result.lines[0].text)
+        self.assertEqual(result.lines[0].text, 'gegenüber neuen Werten. Beide Bereiche können entweder hoch oder')
 
     def test_schulbuch_seite_parsing(self):
         parser = StructuredDocumentParser(
@@ -57,7 +77,7 @@ class TestStructuredDocumentParser(unittest.TestCase):
         paths = normalize_paths([path])
 
         with self.assertRaises(NotImplementedError):
-            result = parser.process({"paths": paths})
+            _ = parser.process({"paths": paths})
         
         #self.assertIsInstance(result, SchulbuchSeite)
         #self.assertIsNotNone(result.raw_text)
